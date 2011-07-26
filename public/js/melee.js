@@ -10,9 +10,7 @@ $(function() {
 		model: Idea,
 		url: '/ideas'
 	});
-	
-	window.Ideas = new IdeaList();
-	
+		
 	window.IdeaView = Backbone.View.extend({
 		className: 'idea',
 		
@@ -60,27 +58,9 @@ $(function() {
 		}
 	});
 	
-	/* App view (our main container) */
-	
-	window.AppView = Backbone.View.extend({
-		el: $('#melee'),
-		
-		initialize: function() {
-			_.bindAll(this, 'render');
-						
-			// TODO init chatview
-			
-			this.ideateView = new IdeateView();
-			// TODO init other views
-		},
-		
-		render: function() {
-			$(this.el).html(this.ideateView.render().el);
-		}
-	});
+	/* Main views (ideate, group, prioritize, export) */
 	
 	window.IdeateView = Backbone.View.extend({
-		//id: 'ideate',
 		events: {
 			"keypress #new-idea": "addIdea"
 		},
@@ -92,10 +72,9 @@ $(function() {
 			this.input = this.$('#new-idea');
 			this.idealist = this.$('#idealist');
 
-			this.ideas = new IdeaList();
-			this.ideas.fetch();
+			Ideas.fetch();
 			this.ideaListView = new IdeaListView({
-				collection: this.ideas
+				collection: Ideas
 			});
 		},
 		
@@ -108,10 +87,30 @@ $(function() {
 		
 		addIdea: function(e) {
 			if(e.keyCode != 13) return;
-			Ideas.create({title: this.input.val()})
+			Ideas.create({title: this.input.val()});
+			this.input.val('');
 		}
 	});
 	
-	window.App = new AppView();
-	App.render();
+	/* App Router */
+	
+	window.Melee = Backbone.Router.extend({
+		routes: {
+			"": "ideate"
+		},
+		
+		initialize: function() {
+			this.container = $('#melee');
+		},
+		
+		ideate: function() {
+			this.ideateView = new IdeateView();
+			this.container.empty();
+			this.container.append(this.ideateView.render().el)
+		}
+	});
+	
+	window.Ideas = new IdeaList();
+	window.melee = new Melee();
+	Backbone.history.start();
 });
