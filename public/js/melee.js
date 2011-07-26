@@ -1,44 +1,36 @@
 $(function() {
 	
-	/* Ideas MVC */
-	
-	window.Idea = Backbone.Model.extend({
-		
-	});
+	window.Idea = Backbone.Model.extend({});
 	
 	window.IdeaList = Backbone.Collection.extend({
 		model: Idea,
 		url: '/ideas'
 	});
+	
+	window.Ideas = new IdeaList();
 		
 	window.IdeaView = Backbone.View.extend({
 		className: 'idea',
+		template: _.template($('#idea-template').html()),
 		
-		events: {
-			"click": "teste"
-		},
-				
 		initialize: function() {
 			_.bindAll(this, 'render');
 			this.model.bind('change', this.render);
-			this.template = _.template($('#idea-template').html());
+			this.model.view = this;
 		},
 		
 		render: function() {
-			var content = this.template(this.model.toJSON());
-			$(this.el).html(content);
+			$(this.el).html(this.template(this.model.toJSON()));
 			return this;
 		},
-		
-		teste: function() {
-			alert('ola');
-		}
 	});
 	
 	window.IdeaListView = Backbone.View.extend({
+		template: _.template($('#idealistview-template').html()),
+		
 		initialize: function(){
 			_.bindAll(this, 'render');
-			this.template = _.template($('#idealistview-template').html());
+			this.collection.bind('add', this.addIdea);
 			this.collection.bind('reset', this.render);
 		},
 		
@@ -55,12 +47,19 @@ $(function() {
 			});
 			
 			return this;
+		},
+		
+		addIdea: function() {
+			var view = new IdeaView({model:Idea});
+			$('#idealist').append(view.render().el);
 		}
 	});
 	
 	/* Main views (ideate, group, prioritize, export) */
 	
 	window.IdeateView = Backbone.View.extend({
+		id: 'ideate',
+		
 		events: {
 			"keypress #new-idea": "addIdea"
 		},
@@ -110,7 +109,6 @@ $(function() {
 		}
 	});
 	
-	window.Ideas = new IdeaList();
 	window.melee = new Melee();
 	Backbone.history.start();
 });

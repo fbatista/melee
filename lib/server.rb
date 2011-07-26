@@ -14,7 +14,7 @@ get "/ideas" do
 end
 
 post "/ideas" do
-	
+	puts params.inspect
 end
 
 # a specific session
