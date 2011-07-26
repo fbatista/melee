@@ -3,21 +3,28 @@
 <head>
 	<meta charset="utf-8">
 	<title>Melee</title>
-	
-	<link rel="stylesheet" href="style/screen.css" media="screen, projection">
-	
+		
 	<script src="js/vendor/jquery-1.5.1.min.js"></script>
 	<script src="js/vendor/underscore.js"></script>
 	<script src="js/vendor/backbone.js"></script>
 	<script src="js/melee.js"></script>
-	
-	<!-- <script type="text/template" id="idea-template">
+	<script type="text/template" id="idea-template">
 		<span class="idea-title"><%= title %></span>
-	</script> -->
+	</script>
+	<script type="text/template" id="idealistview-template">
+		<h1>Ideias</h1>
+	</script>
+	<script type="text/template" id="ideateview-template">
+		<label for="idea">Idea:</label><input type="text" name="idea" value="" id="new-idea" placeholder="write your mind out!">
+		<div id="idealist">
+
+		</div>
+	</script>
 </head>
 
 <body>
-	<div id="container">
-	</div>
+	<div id="melee">
+		
+	</div>	
 </body>
 </html>

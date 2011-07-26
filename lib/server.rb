@@ -7,12 +7,14 @@ get "/" do
   File.readlines("public/index.html")
 end
 
-get "/albums" do
-  content_type "application/json"
-  File.readlines("public/albums.json")
+# session index
+get "/ideas" do
+	content_type "application/json"
+	[{"id" => 1, "title" => "Reciclar o lixo"}, {"id" => 2, "title" => "Comprar capsulas nespresso"}].to_json
 end
 
-get "/favicon.ico" do
-  ""
+# a specific session
+get "/sessions/:id" do
+	
 end
 
