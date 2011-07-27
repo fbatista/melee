@@ -1,28 +1,37 @@
 $(function() {
 	
-	window.Idea = Backbone.Model.extend({});
+	window.Idea = Backbone.Model.extend({
+	});
 	
 	window.IdeaList = Backbone.Collection.extend({
 		model: Idea,
-		url: '/ideas'
+		initialize: function(models, options){
+			this.url = options['url'];
+		}
 	});
-	
-	window.Ideas = new IdeaList();
 		
 	window.IdeaView = Backbone.View.extend({
 		className: 'idea',
 		template: _.template($('#idea-template').html()),
 		
+		events : {
+			"click .idea-delete": "clear"
+		},
+		
 		initialize: function() {
-			_.bindAll(this, 'render');
+			_.bindAll(this, 'render', 'remove');
 			this.model.bind('change', this.render);
-			this.model.view = this;
+			this.model.bind('destroy', this.remove);
 		},
 		
 		render: function() {
 			$(this.el).html(this.template(this.model.toJSON()));
 			return this;
 		},
+		
+		clear: function() {
+			this.model.destroy();
+		}
 	});
 	
 	window.IdeaListView = Backbone.View.extend({
@@ -30,7 +39,7 @@ $(function() {
 		
 		initialize: function(){
 			_.bindAll(this, 'render');
-			this.collection.bind('add', this.addIdea);
+			this.collection.bind('add', this.add);
 			this.collection.bind('reset', this.render);
 		},
 		
@@ -49,8 +58,8 @@ $(function() {
 			return this;
 		},
 		
-		addIdea: function() {
-			var view = new IdeaView({model:Idea});
+		add: function(idea) {
+			var view = new IdeaView({model:idea});
 			$('#idealist').append(view.render().el);
 		}
 	});
@@ -71,7 +80,6 @@ $(function() {
 			this.input = this.$('#new-idea');
 			this.idealist = this.$('#idealist');
 
-			Ideas.fetch();
 			this.ideaListView = new IdeaListView({
 				collection: Ideas
 			});
@@ -95,20 +103,23 @@ $(function() {
 	
 	window.Melee = Backbone.Router.extend({
 		routes: {
-			"": "ideate"
+			"": "home",
+			":id": "ideate",
+			":id/ideate": "ideate"
 		},
 		
 		initialize: function() {
 			this.container = $('#melee');
 		},
 		
-		ideate: function() {
+		home: function() {
+			console.log("im at home!");
+		},
+		
+		ideate: function(id) {
 			this.ideateView = new IdeateView();
 			this.container.empty();
-			this.container.append(this.ideateView.render().el)
+			this.container.append(this.ideateView.render().el);
 		}
 	});
-	
-	window.melee = new Melee();
-	Backbone.history.start();
 });

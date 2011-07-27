@@ -4,21 +4,64 @@ disable :logging
 set :root, File.dirname(__FILE__) + "/../"
 
 get "/" do
-	File.readlines("public/index.html")
+	erb "a"
 end
 
-# session index
-get "/ideas" do
+def get_ideas(id)
+	ideas = $redis.smembers "session:#{id}:ideas"
+	ideas.map do |idea|
+		$redis.hgetall(idea)
+	end
+end
+
+def destroy_idea(session, idea)
+	$redis.srem "session:#{session}:ideas", "idea:#{session}:#{idea}"
+	$redis.del "idea:#{session}:#{idea}"
+end
+
+def save_idea(session, idea)
+	# TODO atomicity between scard and hset
+	idea[:id] = $redis.scard("session:#{session}:ideas").to_i + 1
+	idea.each do |k,v|
+		$redis.hset "idea:#{session}:#{idea[:id]}", k, v
+	end
+	$redis.sadd "session:#{session}:ideas", "idea:#{session}:#{idea[:id]}"
+	idea
+end
+
+post "/:id/ideas" do
 	content_type "application/json"
-	[{"id" => 1, "title" => "Reciclar o lixo"}, {"id" => 2, "title" => "Comprar capsulas nespresso"}].to_json
+	idea = JSON.parse(request.body.read)
+	save_idea(params[:id], idea).to_json
 end
 
-post "/ideas" do
-	puts params.inspect
+get "/:id/ideas" do
+	content_type "application/json"
+	get_ideas(params[:id]).to_json
 end
 
-# a specific session
-get "/sessions/:id" do
-
+delete "/:session/ideas/:id" do
+	destroy_idea(params[:session], params[:id])
+	""
 end
 
+# Session urls
+get "/:id" do
+	erb "window.Ideas = new IdeaList(#{get_ideas(params[:id]).to_json}, {url:'/#{params[:id]}/ideas'});"
+end
+
+get "/:id/ideate" do
+	erb "IDEATE ROUTE"
+end
+
+get "/:id/cluster" do
+	
+end
+
+get "/:id/order" do
+	
+end
+
+get "/:id/export" do
+	
+end

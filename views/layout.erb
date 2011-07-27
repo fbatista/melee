@@ -10,7 +10,10 @@
 	<script src="js/melee.js"></script>
 	
 	<script type="text/template" id="idea-template">
-		<span class="idea-title"><%= title %></span>
+		<span class="idea-title">
+			<%%= title %>
+		</span>
+		<span class="idea-delete">delete</span>
 	</script>
 	<script type="text/template" id="idealistview-template">
 		<h1>Ideias</h1>
@@ -20,9 +23,19 @@
 		<input type="text" name="idea" id="new-idea" placeholder="Add an idea">
 		<div id="idealist"></div>
 	</script>
+	<script>
+		$(function() {
+			<%= yield %>
+			window.melee = new Melee();
+			Backbone.history.start({pushState : true});
+		});
+	</script>
 </head>
 
 <body>
+	<nav>
+		<a href=""></a>
+	</nav>
 	<div id="melee">
 		
 	</div>	
