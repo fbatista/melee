@@ -47,7 +47,7 @@ end
 
 # Session urls
 get "/:id" do
-	erb "window.Ideas = new IdeaList(#{get_ideas(params[:id]).to_json}, {url:'/#{params[:id]}/ideas'});"
+	erb "window.ideas = new IdeaList(#{get_ideas(params[:id]).to_json}, {url:'/#{params[:id]}/ideas'});"
 end
 
 get "/:id/ideate" do
