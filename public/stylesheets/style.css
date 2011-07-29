@@ -344,19 +344,12 @@ nav #menu_export {
 }
 .idea .idea-delete {
   display: none;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 10px;
-  margin-right: -5px;
-  margin-top: -5px;
-  width: 15px;
-  height: 15px;
-  text-align: center;
+  margin-right: -20px;
+  margin-top: -20px;
+  width: 20px;
+  height: 20px;
   float: right;
-  background: #333;
-  -moz-border-radius: 15px;
-  border-radius: 15px;
-  color: #fff;
-  line-height: 1em;
+  cursor: pointer;
 }
 #new-idea {
   padding: 5px;
