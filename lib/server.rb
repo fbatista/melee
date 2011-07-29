@@ -37,6 +37,14 @@ def get_new_id(set_id, sorted=true)
 	return candidate
 end
 
+def get_new_session
+	key = "" 
+	begin
+		key = (rand * 999999999999999).to_i.to_s(36)
+	end while $redis.exists(key)
+	return key
+end
+
 post "/:id/ideas" do
 	content_type "application/json"
 	idea = JSON.parse(request.body.read)
