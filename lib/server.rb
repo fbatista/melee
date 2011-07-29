@@ -3,10 +3,6 @@ require "./lib/init"
 disable :logging
 set :root, File.dirname(__FILE__) + "/../"
 
-get "/" do
-	erb "a"
-end
-
 def get_ideas(id)
 	ideas = $redis.zrange "session:#{id}:ideas", 0, -1
 	ideas.map do |idea|
@@ -46,9 +42,8 @@ def get_new_session
 end
 
 get "/" do
-	
+	erb :index
 end
-
 post "/" do
 	content_type "application/json"
 	{:id => get_new_session}.to_json
