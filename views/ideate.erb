@@ -1,1 +1,1 @@
-{ideate : {ideas : new IdeaList(<%= @ideas %>, {url:'/<%= @sessionid %>/ideas'})}}
+{ideas : new IdeaList(<%= @ideas %>, {url:'/<%= @sessionid %>/ideas'}), session : new Session({id : '<%= @sessionid %>'})}

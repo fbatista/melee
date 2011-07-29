@@ -39,7 +39,7 @@ end
 def get_new_id(set_id, sorted=true)
 	candidate = ""
 	begin
-		candidate = base62 (rand * 9999999999999999 + Time.now.to_i).to_i
+		candidate = base62((rand * 9999999999999999 + Time.now.to_i).to_i)
 	end while (sorted ? !!$redis.zrank(set_id, candidate) : $redis.sismember(set_id, candidate))
 	return candidate
 end
@@ -47,7 +47,7 @@ end
 def get_new_session
 	key = "" 
 	begin
-		key = base62 (rand * 999999999999999).to_i
+		key = base62((rand * 90000000000).to_i + 100000000)
 	end while $redis.sismember("melee:sessions", key)
 	$redis.sadd "melee:sessions", key
 	return key
@@ -55,7 +55,9 @@ end
 
 post "/" do
 	content_type "application/json"
-	{:id => get_new_session}.to_json
+	k = get_new_session
+	puts k
+	{:id => k}.to_json
 end
 
 post "/:id/ideas" do

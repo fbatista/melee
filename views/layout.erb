@@ -19,6 +19,7 @@
 			<%%= title %>
 		</span>
 	</script>
+	
 	<script type="text/template" id="idealistview-template">
 		<h1>Ideias</h1>
 	</script>
@@ -31,6 +32,13 @@
 		<input type="text" name="idea" id="new-idea" placeholder="Add an idea">
 		<div id="idealist"></div>
 	</script>
+	
+	<script type="text/template" id="clusterview-template">
+		<input type="text" name="idea" id="new-cluster" placeholder="Add a cluster">
+		<div id="clusterlist"></div>
+		<div id="unsortedlist"></div>
+	</script>
+	
 	<script>
 		$(function() {
 			window.melee = new Melee(<%= yield %>);
