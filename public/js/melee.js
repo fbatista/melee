@@ -1,5 +1,9 @@
 $(function() {
 	
+	window.Session = Backbone.Model.extend({
+		url : '/'
+	});
+	
 	window.Idea = Backbone.Model.extend({
 	});
 	
@@ -15,7 +19,9 @@ $(function() {
 		template: _.template($('#idea-template').html()),
 		
 		events : {
-			"click .idea-delete": "clear"
+			"click .idea-delete": "clear",
+			"mouseover": "showDelete",
+			"mouseout": "hideDelete"
 		},
 		
 		initialize: function() {
@@ -31,6 +37,14 @@ $(function() {
 		
 		clear: function() {
 			this.model.destroy();
+		},
+		
+		showDelete: function() {
+			this.$(".idea-delete").show();
+		},
+		
+		hideDelete: function() {
+			this.$(".idea-delete").hide();
 		}
 	});
 	
@@ -65,6 +79,33 @@ $(function() {
 	});
 	
 	/* Main views (ideate, group, prioritize, export) */
+	window.SessionView = Backbone.View.extend({
+		id: 'session', 
+		events: {
+			"click #new-session" : "start"
+		},
+		initialize : function() {
+			_.bindAll(this, "start", "render");
+			this.template = _.template($('#startsession-template').html());
+			$(this.el).html(this.template());
+			this.startButton = this.$('#new-session');
+			this.model = new Session();
+			this.model.bind("change", this.proceed);
+		},
+		render : function() {
+			return this;
+		},
+		
+		proceed : function() {
+			window.session = this;
+			melee.navigate(this.id+"/ideate", true);
+		},
+		
+		start : function() {
+			//todo fetch a session ID from server
+			this.model.save();
+		}
+	});
 	
 	window.IdeateView = Backbone.View.extend({
 		id: 'ideate',
@@ -79,14 +120,12 @@ $(function() {
 			$(this.el).html(this.template());
 			this.input = this.$('#new-idea');
 			this.idealist = this.$('#idealist');
-
 			this.ideaListView = new IdeaListView({
-				collection: Ideas
+				collection: ideas
 			});
 		},
 		
 		render: function() {
-			
 			// display ideas			
 			$(this.idealist).html(this.ideaListView.render().el);
 			return this;
@@ -94,8 +133,50 @@ $(function() {
 		
 		addIdea: function(e) {
 			if(e.keyCode != 13) return;
-			Ideas.create({title: this.input.val()});
+			ideas.create({title: this.input.val()});
 			this.input.val('');
+		},
+		
+		proceed: function() {
+			melee.navigate(this.id+"/cluster", true);
+		}
+	});
+	
+	window.ClusterView = Backbone.View.extend({
+		id: 'cluster',
+		
+		events: {
+			'keypress #new-cluster': 'addCluster'
+		},
+		
+		initialize: function() {
+			_.bindAll(this, 'addCluster', 'render');
+			this.template = _.template($('#clusterview-template').html());
+			$(this.el).html(this.template());
+			this.input = this.$('#new-cluster');
+			this.clusterlist = this.$('#clusterlist');
+			this.clusterListView = new ClusterListView({
+				collection: clusters
+			});
+			this.unsortedlist = this.$('#unsortedlist');
+			this.unsortedListView = new IdeaListView({
+				collection: unsortedIdeas
+			});
+		},
+		
+		render: function() {
+			$(this.unsortedlist).html(this.unsortedListView.render().el);
+			return this;
+		},
+		
+		addCluster: function(e){
+			if(e.keyCode != 12) return;
+			clusters.create({title: this.input.val()});
+			this.input.val('');
+		},
+		
+		proceed: function() {
+			melee.navigate(this.id+"/prioritize", true);
 		}
 	});
 	
@@ -105,7 +186,10 @@ $(function() {
 		routes: {
 			"": "home",
 			":id": "ideate",
-			":id/ideate": "ideate"
+			":id/ideate": "ideate",
+			":id/cluster" : "cluster",
+			":id/prioritize" : "prioritize",
+			":id/export" : "exportit"
 		},
 		
 		initialize: function() {
@@ -113,13 +197,44 @@ $(function() {
 		},
 		
 		home: function() {
-			console.log("im at home!");
+			this.sessionView = new SessionView();
+			this.container.empty();
+			this.container.append(this.sessionView.render().el);
 		},
 		
 		ideate: function(id) {
+			this.checkBootstrap();
 			this.ideateView = new IdeateView();
 			this.container.empty();
 			this.container.append(this.ideateView.render().el);
+		},
+		
+		cluster: function(id) {
+			this.checkBootstrap();
+			this.clusterView = new ClusterView();
+			this.container.empty();
+			this.container.append(this.clusterView.render().el);
+		},
+		
+		prioritize: function(id) {
+			this.checkBootstrap();
+			this.prioritizeView = new PrioritizeView();
+			this.container.empty();
+			this.container.append(this.prioritizeView.render().el);
+		},
+		
+		exportit: function(id) {
+			this.checkBootstrap();
+			this.exportView = new ExportView();
+			this.container.empty();
+			this.container.append(this.exportView.render().el);
+		},
+		
+		checkBootstrap: function() {
+			if(window['ideas'] === undefined){
+				window.ideas = new IdeaList([], {url : "/"+session.id+"/ideas"});
+				window.ideas.fetch();
+			}
 		}
 	});
 });
