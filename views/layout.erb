@@ -33,8 +33,7 @@
 	</script>
 	<script>
 		$(function() {
-			<%= yield %>
-			window.melee = new Melee();
+			window.melee = new Melee(<%= yield %>);
 			Backbone.history.start({pushState : true});
 		});
 	</script>

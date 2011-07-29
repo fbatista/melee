@@ -122,16 +122,18 @@ $(function() {
 			"keypress #new-idea": "addIdea"
 		},
 
-		initialize: function() {
+		initialize: function(opts) {
 			_.bindAll(this, 'addIdea', 'render');
 			this.template = _.template($('#ideateview-template').html());
 			$(this.el).html(this.template());
 			this.input = this.$('#new-idea');
 			this.idealist = this.$('#idealist');
 			
-			if(!window['ideas']){
-				window.ideas = new IdeaList([], {url : "/"+session.id+"/ideas"});
-				window.ideas.fetch();
+			var ideas = opts['ideas'];
+			
+			if(!ideas){
+				ideas = new IdeaList([], {url : "/"+session.id+"/ideas"});
+				ideas.fetch();
 			}
 			this.ideaListView = new IdeaListView({
 				collection: ideas
@@ -205,9 +207,13 @@ $(function() {
 			":id/export" : "exportit"
 		},
 		
-		initialize: function() {
+		initialize: function(opts) {
 			this.container = $('#melee');
 			this.sessionView = new SessionView();
+			this.ideateView = new IdeateView(opts['ideate']);
+			this.clusterView = new ClusterView(opts['cluster']);
+			this.prioritizeView = new PrioritizeView(opts['prioritize']);
+			this.exportView = new ExportView(opts['export']);
 		},
 		
 		home: function() {
@@ -217,22 +223,18 @@ $(function() {
 		
 		ideate: function(id) {
 			$('nav').show();
-			this.ideateView = new IdeateView();
 			this.container.append(this.ideateView.render().el);
 		},
 		
 		cluster: function(id) {
-			this.clusterView = new ClusterView();
 			this.container.append(this.clusterView.render().el);
 		},
 		
 		prioritize: function(id) {
-			this.prioritizeView = new PrioritizeView();
 			this.container.append(this.prioritizeView.render().el);
 		},
 		
 		exportit: function(id) {
-			this.exportView = new ExportView();
 			this.container.append(this.exportView.render().el);
 		}
 	});

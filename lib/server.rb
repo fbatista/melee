@@ -25,10 +25,21 @@ def save_idea(session, idea)
 	idea
 end
 
+BASE_62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+def base62(num)
+	ret = ""
+	begin
+		t = num % 62
+		num = (num - t) / 62
+		ret = BASE_62[t..t] + ret
+	end while num != 0
+	return ret
+end
+
 def get_new_id(set_id, sorted=true)
 	candidate = ""
 	begin
-		candidate = (rand * 9999999999999999 + Time.now.to_i).to_i.to_s(36) << (rand * 9999999999999999 + Time.now.to_i).to_i.to_s(36) << (rand * 9999999999999999 + Time.now.to_i).to_i.to_s(36)
+		candidate = base62 (rand * 9999999999999999 + Time.now.to_i).to_i
 	end while (sorted ? !!$redis.zrank(set_id, candidate) : $redis.sismember(set_id, candidate))
 	return candidate
 end
@@ -36,14 +47,12 @@ end
 def get_new_session
 	key = "" 
 	begin
-		key = (rand * 999999999999999).to_i.to_s(36)
-	end while $redis.exists(key)
+		key = base62 (rand * 999999999999999).to_i
+	end while $redis.sismember("melee:sessions", key)
+	$redis.sadd "melee:sessions", key
 	return key
 end
 
-get "/" do
-	erb :index
-end
 post "/" do
 	content_type "application/json"
 	{:id => get_new_session}.to_json
@@ -71,17 +80,24 @@ get "/:id" do
 end
 
 get "/:id/ideate" do
-	erb "window.ideas = new IdeaList(#{get_ideas(params[:id]).to_json}, {url:'/#{params[:id]}/ideas'});"
+	@ideas = get_ideas(params[:id]).to_json
+	@sessionid = params[:id]
+	erb :ideate
+end
+
+# APP ENTRY POINTS
+get "/" do
+	erb :index
 end
 
 get "/:id/cluster" do
-	
+	erb :cluster
 end
 
 get "/:id/prioritize" do
-	
+	erb :prioritize
 end
 
 get "/:id/export" do
-	
+	erb :export
 end
