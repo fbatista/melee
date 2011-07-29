@@ -1,0 +1,94 @@
+@import "bootstrap.less";
+
+@ff: "Helvetica Neue", Helvetica, Arial, sans-serif;
+@mono: 'Droid Sans Mono', Courier, "Courier New", monospace;
+@bg: #eee; /* main page background color */
+@sb: 130px; /* sidebar size */
+
+body {
+	background: @bg;
+	padding: 0px;
+	margin: 0;
+	color: #444;
+	font: 12px "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+a {
+	color: #00B7FF;
+	text-decoration: none;
+}
+
+nav {
+	background: #333;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: @sb;
+	#gradient > .vertical(#333,#000);
+	/*padding-top: 30px;*/
+
+	a {
+		text-align: right;
+		font-size: 12px;
+		font-weight: bold;
+		color: #aaa;
+		display: block;
+		padding: 15px 15px;
+		background: #222;
+		border-bottom: 1px solid #333;
+	}
+	
+	#menu_ideate { background: #222 url("/images/ideate.png") no-repeat 15px}
+	#menu_cluster { background: #222 url("/images/cluster.png") no-repeat 12px}
+	#menu_prioritize { background: #222 url("/images/prioritize.png") no-repeat 12px}
+	#menu_export { background: #222 url("/images/export.png") no-repeat 14px}
+}
+
+#melee {
+	background: @bg;
+	padding: 40px;
+	margin-left: @sb;
+}
+
+/* ideate */
+
+.idea {
+	padding: 15px;
+	width: 100px;
+	height: 100px;
+	float: left;
+	margin-right: 15px;
+	margin-bottom: 15px;
+	#gradient > .vertical(#fff999,#fff000);
+	.border-radius(4px);
+	.box-shadow;
+	font-size: 11px;
+	line-height: 1.5em;
+	font-family: 'Droid Sans Mono', Courier, "Courier New", monospace;
+	
+	.idea-delete {
+		display: none;
+		font-family: @ff;
+		font-size: 10px;
+		margin-right: -5px;
+		margin-top: -5px;
+		width: 15px;
+		height: 15px;
+		text-align: center;
+		float: right;
+		background: #333;
+		.border-radius(15px);
+		color: #fff;
+		line-height: 1em;
+	}
+}
+
+#new-idea {
+	padding: 5px;
+	font-size: 24px;
+	font-family: @ff;
+	font-weight: bold;
+	width: 100%;
+	margin-bottom: 20px;
+}
