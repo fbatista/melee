@@ -9,14 +9,21 @@
 	<script src="js/vendor/backbone.js"></script>
 	<script src="js/melee.js"></script>
 	
+	<link href='http://fonts.googleapis.com/css?family=Droid+Sans+Mono' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="/stylesheets/style.css" type="text/css" media="screen" charset="utf-8">
+	
 	<script type="text/template" id="idea-template">
+		<div class="idea-delete">×</div>
 		<span class="idea-title">
 			<%%= title %>
 		</span>
-		<span class="idea-delete">delete</span>
 	</script>
 	<script type="text/template" id="idealistview-template">
 		<h1>Ideias</h1>
+	</script>
+	
+	<script type="text/template" id="startsession-template">
+		<span id="new-session">START!</span>
 	</script>
 	
 	<script type="text/template" id="ideateview-template">
@@ -34,7 +41,10 @@
 
 <body>
 	<nav>
-		<a href=""></a>
+		<a id="menu_ideate" href="#">Ideate</a>
+		<a id="menu_cluster" href="#">Cluster</a>
+		<a id="menu_prioritize" href="#">Prioritize</a>
+		<a id="menu_export" href="#">Export</a>
 	</nav>
 	<div id="melee">
 		
