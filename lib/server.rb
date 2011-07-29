@@ -45,6 +45,15 @@ def get_new_session
 	return key
 end
 
+get "/" do
+	
+end
+
+post "/" do
+	content_type "application/json"
+	{:id => get_new_session}.to_json
+end
+
 post "/:id/ideas" do
 	content_type "application/json"
 	idea = JSON.parse(request.body.read)
@@ -74,7 +83,7 @@ get "/:id/cluster" do
 	
 end
 
-get "/:id/order" do
+get "/:id/prioritize" do
 	
 end
 
