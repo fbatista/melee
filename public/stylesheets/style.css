@@ -279,6 +279,10 @@ nav a {
   background: #222;
   border-bottom: 1px solid #333;
 }
+nav a.current {
+  background-color: black !important;
+  color: yellow;
+}
 nav #menu_ideate {
   background: #222222 url("/images/ideate.png") no-repeat 15px;
 }

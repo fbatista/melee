@@ -18,6 +18,26 @@ $(function() {
 			this.url = options['url'];
 		}
 	});
+	
+	window.Cluster = Backbone.Model.extend({
+	});
+	
+	window.ClusterList = Backbone.Collection.extend({
+		model: Cluster,
+		initialize: function(models, options){
+			this.url = options['url'];
+		}
+	});
+	
+	//VIEW FOR CLUSTER MODEL
+	window.ClusterView = Backbone.View.extend({
+		
+	});
+	
+	//VIEW FOR CLUSTER COLLECTION
+	window.ClusterListView = Backbone.View.extend({
+		
+	});
 		
 	window.IdeaView = Backbone.View.extend({
 		className: 'idea',
@@ -174,7 +194,8 @@ $(function() {
 		}
 	});
 	
-	window.ClusterView = Backbone.View.extend({
+	//VIEW FOR CLUSTER ROUTE STEP
+	window.ClusterateView = Backbone.View.extend({
 		id: 'cluster',
 		
 		events: {
@@ -183,7 +204,7 @@ $(function() {
 		
 		initialize: function() {
 			_.bindAll(this, 'addCluster', 'render');
-			this.template = _.template($('#clusterview-template').html());
+			this.template = _.template($('#clusterateview-template').html());
 			$(this.el).html(this.template());
 			this.input = this.$('#new-cluster');
 			this.clusterlist = this.$('#clusterlist');
@@ -194,7 +215,7 @@ $(function() {
 			if(!this.bootstrapped){
 				this.router = opts.router;
 				this.clusters = opts['clusters'];
-				if (!clusters) {
+				if (!this.clusters) {
 					this.clusters = new ClusterList([], {url : "/"+opts['session'].id+"/clusters"});
 					this.clusters.fetch();
 				}
@@ -203,8 +224,8 @@ $(function() {
 				});
 				
 				this.unsortedIdeas = opts['unsortedIdeas'];
-				if (!unsortedIdeas) {
-					this.unsortedIdeas = new IdeaList([], {url : "/"+opts['session'].id+"/ideas"});
+				if (!this.unsortedIdeas) {
+					this.unsortedIdeas = new IdeaList([], {url : "/"+opts['session'].id+"/unsorted"});
 					this.unsortedIdeas.fetch();
 				}
 				this.unsortedListView = new IdeaListView({
@@ -248,7 +269,7 @@ $(function() {
 			this.container = $('#melee');
 			this.sessionView = new SessionView();
 			this.ideateView = new IdeateView();
-			this.clusterView = new ClusterView();
+			this.clusterateView = new ClusterateView();
 			//this.prioritizeView = new PrioritizeView();
 			//this.exportView = new ExportView();
 		},
@@ -264,24 +285,33 @@ $(function() {
 		},
 		
 		ideate: function(id) {
-			$('nav').show();
+			this.highlightNav('ideate');
 			this.ideateView.bootstrap(this.opts);
 			this.container.append(this.ideateView.render().el);
 		},
 		
 		cluster: function(id) {
-			this.clusterView.bootstrap(this.opts);
-			this.container.append(this.clusterView.render().el);
+			this.highlightNav('cluster');
+			this.clusterateView.bootstrap(this.opts);
+			this.container.append(this.clusterateView.render().el);
 		},
 		
 		prioritize: function(id) {
+			this.highlightNav('prioritize');
 			this.prioritizeView.bootstrap(this.opts);
 			this.container.append(this.prioritizeView.render().el);
 		},
 		
 		exportit: function(id) {
+			this.highlightNav('export');
 			this.exportView.bootstrap(this.opts);
 			this.container.append(this.exportView.render().el);
+		},
+		
+		highlightNav : function(view) {
+			$('nav').show();
+			$('nav a#menu_'+view).addClass('current');
+			$('nav a:not(#menu_'+view+')').removeClass('current');
 		}
 	});
 });

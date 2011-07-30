@@ -10,19 +10,51 @@ def get_ideas(id)
 	end
 end
 
+def get_unsorted(id)
+	get_ideas(id).select do |idea|
+		idea['cluster'].nil?
+	end
+end
+
+def get_clusters(id)
+	clusters = $redis.smembers "session:#{id}:clusters"
+	clusters.map do |cluster|
+		$redis.hgetall(cluster)
+	end
+end
+
 def destroy_idea(session, idea)
 	$redis.zrem "session:#{session}:ideas", "idea:#{session}:#{idea}"
 	$redis.del "idea:#{session}:#{idea}"
 end
 
-def save_idea(session, idea)
+def destroy_cluster(session, cluster)
+	cluster_ideas = $redis.smembers "cluster:#{session}:#{cluster}:ideas"
+	cluster_ideas.each do |idea|
+		$redis.hdel idea, "cluster"
+	end
+	$redis.srem "session:#{session}:clusters", "cluster:#{session}:#{cluster}"
+	$redis.del "cluster:#{session}:#{cluster}"
+end
+
+def save_idea(session, idea, id = nil)
 	# TODO atomicity
-	idea[:id] = get_new_id("session:#{session}:ideas")
+	idea[:id] = id || get_new_id("session:#{session}:ideas")
 	idea.each do |k,v|
 		$redis.hset "idea:#{session}:#{idea[:id]}", k, v
 	end
-	$redis.zadd "session:#{session}:ideas", 0, "idea:#{session}:#{idea[:id]}"
+	$redis.zadd "session:#{session}:ideas", 0, "idea:#{session}:#{idea[:id]}" unless id
 	idea
+end
+
+def save_cluster(session, cluster, id = nil)
+	# TODO atomicity
+	cluster[:id] = id || get_new_id("session:#{session}:clusters", false)
+	cluster.each do |k,v|
+		$redis.hset "cluster:#{session}:#{cluster[:id]}", k, v
+	end
+	$redis.sadd "session:#{session}:clusters", "cluster:#{session}:#{cluster[:id]}" unless id
+	cluster
 end
 
 BASE_62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -66,9 +98,25 @@ post "/:id/ideas" do
 	save_idea(params[:id], idea).to_json
 end
 
+post "/:id/clusters" do
+	content_type "application/json"
+	cluster = JSON.parse(request.body.read)
+	save_cluster(params[:id], cluster).to_json
+end
+
 get "/:id/ideas" do
 	content_type "application/json"
 	get_ideas(params[:id]).to_json
+end
+
+get "/:id/unsorted" do
+	content_type "application/json"
+	get_unsorted(params[:id]).to_json
+end
+
+get "/:id/clusters" do
+	content_type "application/json"
+	get_clusters(params[:id]).to_json
 end
 
 delete "/:session/ideas/:id" do
@@ -76,9 +124,31 @@ delete "/:session/ideas/:id" do
 	""
 end
 
+delete "/:session/clusters/:id" do
+	destroy_cluster(params[:session], params[:id])
+	""
+end
+
+put "/:session/ideas/:id" do
+	content_type "application/json"
+	idea = JSON.parse(request.body.read)
+	save_idea(params[:session], idea, params[:id]).to_json
+end
+
+put "/:session/clusters/:id" do
+	content_type "application/json"
+	cluster = JSON.parse(request.body.read)
+	save_cluster(params[:session], cluster, params[:id]).to_json
+end
+
 # Session urls
 get "/:id" do
 	redirect_to "/#{params[:id]}/ideate"
+end
+
+# APP ENTRY POINTS
+get "/" do
+	erb :index
 end
 
 get "/:id/ideate" do
@@ -87,12 +157,10 @@ get "/:id/ideate" do
 	erb :ideate
 end
 
-# APP ENTRY POINTS
-get "/" do
-	erb :index
-end
-
 get "/:id/cluster" do
+	@unsorted = get_unsorted(params[:id]).to_json
+	@sessionid = params[:id]
+	@clusters = get_clusters(params[:id]).to_json
 	erb :cluster
 end
 

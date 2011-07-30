@@ -1,0 +1,5 @@
+{
+	unsortedIdeas : new IdeaList(<%= @unsorted %>, {url:'/<%= @sessionid %>/unsorted'}), 
+	session : new Session({id : '<%= @sessionid %>'}),
+	clusters : new ClusterList(<%= @clusters %>, {url:'/<%= @sessionid %>/clusters'})
+}
