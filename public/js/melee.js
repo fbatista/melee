@@ -15,11 +15,20 @@ $(function() {
 	window.IdeaList = Backbone.Collection.extend({
 		model: Idea,
 		initialize: function(models, options){
-			this.url = options['url'];
+			if(options !== undefined)
+				this.url = options['url'];
+			else
+				this.url = '/ideas';
 		}
 	});
 	
 	window.Cluster = Backbone.Model.extend({
+		initialize: function(){
+			this.ideas = new IdeaList();
+			this.ideas.url = _.bind(function(){
+				return this.url() + '/ideas';
+			}, this);
+		}
 	});
 	
 	window.ClusterList = Backbone.Collection.extend({
@@ -31,12 +40,91 @@ $(function() {
 	
 	//VIEW FOR CLUSTER MODEL
 	window.ClusterView = Backbone.View.extend({
+		className: 'cluster',
+		expanded: false,
+		template: _.template($('#cluster-template').html()),
 		
+		events : {
+			"click" : "toggleIdeas",
+			"click .cluster-delete": "clear",
+			"mouseover": "showDelete",
+			"mouseout": "hideDelete"
+		},
+		
+		initialize: function() {
+			_.bindAll(this, 'render', 'remove', 'toggleIdeas', 'showIdeas');
+			this.model.bind('change', this.render);
+			this.model.bind('destroy', this.remove);
+			this.model.ideas.bind('reset', this.showIdeas);
+			this.idealistview = new IdeaListView({collection : this.model.ideas});
+		},
+		
+		render: function() {
+			$(this.el).html(this.template(this.model.toJSON()));
+			this.hideIdeas();
+			$(this.el).find(".cluster-ideas").html(this.idealistview.render().el);
+			return this;
+		},
+		
+		showIdeas: function(){
+			$(this.el).find(".cluster-ideas").show();
+		},
+		
+		hideIdeas: function(){
+			$(this.el).find(".cluster-ideas").hide();
+		},
+		
+		toggleIdeas: function() {
+			this.expanded = !this.expanded;
+			if(this.expanded){
+				this.model.ideas.fetch();
+			} else {
+				this.hideIdeas();
+			}
+		},
+		
+		clear: function() {
+			this.model.destroy();
+		},
+		
+		showDelete: function() {
+			this.$(".cluster-delete").show();
+		},
+		
+		hideDelete: function() {
+			this.$(".cluster-delete").hide();
+		}
 	});
 	
 	//VIEW FOR CLUSTER COLLECTION
 	window.ClusterListView = Backbone.View.extend({
+		template: _.template($('#clusterlistview-template').html()),
 		
+		initialize: function(){
+			_.bindAll(this, 'render');
+			this.collection.bind('add', this.add);
+			this.collection.bind('reset', this.render);
+		},
+		
+		render: function(){			
+			var $ideas, collection = this.collection;
+			
+			$(this.el).html(this.template());
+			$clusters = $(this.el);
+			collection.each(function(cluster){
+				var view = new ClusterView({
+					model : cluster
+				});
+				$clusters.append(view.render().el);
+			});
+			
+			return this;
+		},
+		
+		add: function(cluster) {
+			var view = new ClusterView({model:cluster});
+			$('#clusterlist').append(view.render().el);
+		}
 	});
 		
 	window.IdeaView = Backbone.View.extend({
@@ -82,7 +170,8 @@ $(function() {
 			this.collection.bind('reset', this.render);
 		},
 		
-		render: function(){			
+		render: function(){
+			console.log("rendering idea list");
 			var $ideas, collection = this.collection;
 			
 			$(this.el).html(this.template());
@@ -198,6 +287,8 @@ $(function() {
 	window.ClusterateView = Backbone.View.extend({
 		id: 'cluster',
 		
+		bootstrapped: false,
+		
 		events: {
 			'keypress #new-cluster': 'addCluster'
 		},
@@ -236,12 +327,13 @@ $(function() {
 		},
 		
 		render: function() {
+			$(this.clusterlist).html(this.clusterListView.render().el);
 			$(this.unsortedlist).html(this.unsortedListView.render().el);
 			return this;
 		},
 		
 		addCluster: function(e){
-			if(e.keyCode != 12) return;
+			if(e.keyCode != 13) return;
 			this.clusters.create({title: this.input.val()});
 			this.input.val('');
 		},

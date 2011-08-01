@@ -355,11 +355,27 @@ nav #menu_export {
   float: right;
   cursor: pointer;
 }
-#new-idea {
+#new-idea, #new-cluster {
   padding: 5px;
   font-size: 24px;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: bold;
   width: 100%;
   margin-bottom: 20px;
+}
+/* cluster */
+#clusterlist, #unsortedlist {
+  clear: both;
+}
+.cluster {
+  border: 3px dashed gray;
+  padding: 5px;
+  margin: 5px;
+  float: left;
+  -moz-border-radius: 15px;
+  border-radius: 15px;
+}
+.cluster .cluster-title {
+  font-size: 400%;
+  color: gray;
 }

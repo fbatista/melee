@@ -3,8 +3,8 @@ require "./lib/init"
 disable :logging
 set :root, File.dirname(__FILE__) + "/../"
 
-def get_ideas(id)
-	ideas = $redis.zrange "session:#{id}:ideas", 0, -1
+def get_ideas(session, cluster=nil)
+	ideas = cluster ? $redis.smembers("cluster:#{session}:#{cluster}:ideas") : $redis.zrange("session:#{session}:ideas", 0, -1)
 	ideas.map do |idea|
 		$redis.hgetall(idea)
 	end
@@ -107,6 +107,11 @@ end
 get "/:id/ideas" do
 	content_type "application/json"
 	get_ideas(params[:id]).to_json
+end
+
+get "/:session/clusters/:id/ideas" do
+	content_type "application/json"
+	get_ideas(params[:session], params[:id]).to_json
 end
 
 get "/:id/unsorted" do

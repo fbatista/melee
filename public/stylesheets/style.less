@@ -83,11 +83,29 @@ nav {
 	}
 }
 
-#new-idea {
+#new-idea, #new-cluster {
 	padding: 5px;
 	font-size: 24px;
 	font-family: @ff;
 	font-weight: bold;
 	width: 100%;
 	margin-bottom: 20px;
+}
+
+/* cluster */
+#clusterlist, #unsortedlist {
+	clear: both;
+}
+
+.cluster {
+	border: 3px dashed gray;
+	padding: 5px;
+	margin: 5px;
+	float: left;
+	.border-radius(15px);
+	
+	.cluster-title {
+		font-size: 400%;
+		color: gray;
+	}
 }
