@@ -67,11 +67,11 @@ $(function() {
 		},
 		
 		showIdeas: function(){
-			$(this.el).find(".cluster-ideas").show();
+			$(this.el).find(".cluster-ideas, .arrow, .arrow-border").show();
 		},
 		
 		hideIdeas: function(){
-			$(this.el).find(".cluster-ideas").hide();
+			$(this.el).find(".cluster-ideas, .arrow, .arrow-border").hide();
 		},
 		
 		toggleIdeas: function() {

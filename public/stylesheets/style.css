@@ -378,4 +378,74 @@ nav #menu_export {
 .cluster .cluster-title {
   font-size: 400%;
   color: gray;
+  position: relative;
+}
+.cluster .cluster-title .arrow, .cluster .cluster-title .arrow-border {
+  border-color: transparent transparent black transparent;
+  border-style: solid;
+  border-width: 20px;
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  bottom: -15px;
+}
+.cluster .cluster-title .arrow {
+  border-color: transparent transparent #333 transparent;
+  bottom: -20px;
+  z-index: 20;
+}
+.cluster .cluster-ideas {
+  position: absolute;
+  right: 0px;
+  left: 130px;
+  display: block;
+  margin-top: 15px;
+  border-top: 3px solid black;
+  z-index: 10;
+}
+.cluster .cluster-ideas > div {
+  background-color: #000000;
+  background-repeat: repeat-x;
+  background-image: -khtml-gradient(linear, left top, left bottom, from(#333333), to(#000000));
+  /* Konqueror */
+
+  background-image: -moz-linear-gradient(#333333, #000000);
+  /* FF 3.6+ */
+
+  background-image: -ms-linear-gradient(#333333, #000000);
+  /* IE10 */
+
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #333333), color-stop(100%, #000000));
+  /* Safari 4+, Chrome 2+ */
+
+  background-image: -webkit-linear-gradient(#333333, #000000);
+  /* Safari 5.1+, Chrome 10+ */
+
+  background-image: -o-linear-gradient(#333333, #000000);
+  /* Opera 11.10 */
+
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#333333', endColorstr='#000000', GradientType=0);
+  /* IE6 & IE7 */
+
+  -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#333333', endColorstr='#000000', GradientType=0)";
+  /* IE8+ */
+
+  background-image: linear-gradient(#333333, #000000);
+  /* the standard */
+
+  clear: both;
+  float: left;
+  width: 100%;
+  min-height: 95px;
+  padding-top: 15px;
+}
+.cluster .cluster-ideas > div .idea {
+  margin-left: 15px;
+  margin-right: 0px;
+  width: 50px;
+  height: 50px;
+  font-size: 8px;
+}
+.cluster .cluster-ideas h1 {
+  display: none;
 }

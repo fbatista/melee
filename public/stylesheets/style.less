@@ -107,5 +107,53 @@ nav {
 	.cluster-title {
 		font-size: 400%;
 		color: gray;
+		position: relative;
+		
+		.arrow, .arrow-border {
+			border-color: transparent transparent black transparent;
+			border-style: solid;
+			border-width: 20px;
+			width: 0px;
+			height: 0px;
+			position: absolute;
+			bottom: -15px;
+		}
+		
+		.arrow {
+			border-color: transparent transparent #333 transparent;
+			bottom: -20px;
+			z-index: 20;
+		}
+	}
+	
+	.cluster-ideas {
+		position: absolute;
+		right: 0px;
+		left: 130px;
+		display: block;
+		margin-top: 15px;
+		border-top: 3px solid black;
+		z-index: 10;
+		
+		> div {
+			#gradient > .vertical(#333,#000);
+			clear:both;
+			float:left;
+			width: 100%;
+			min-height: 95px;
+			padding-top: 15px;
+			
+			.idea  {
+				margin-left: 15px;
+				margin-right: 0px;
+				width: 50px;
+				height: 50px;
+				font-size: 8px;
+			}
+		}
+		
+		h1 {
+			display: none;
+		}
 	}
 }
