@@ -23,9 +23,23 @@ def get_clusters(id)
 	end
 end
 
+def get_idea(session, idea)
+	$redis.hgetall "idea:#{session}:#{idea}"
+end
+
 def destroy_idea(session, idea)
 	$redis.zrem "session:#{session}:ideas", "idea:#{session}:#{idea}"
 	$redis.del "idea:#{session}:#{idea}"
+end
+
+def remove_idea_from_cluster(session, cluster, idea)
+	$redis.srem "cluster:#{session}:#{cluster}:ideas", "idea:#{session}:#{idea}"
+	$redis.hdel "idea:#{session}:#{idea}", "cluster"
+end
+
+def add_idea_to_cluster(session, cluster, idea)
+	$redis.sadd "cluster:#{session}:#{cluster}:ideas", "idea:#{session}:#{idea}"
+	$redis.hset "idea:#{session}:#{idea}", "cluster", "cluster:#{session}:#{cluster}"
 end
 
 def destroy_cluster(session, cluster)
@@ -34,6 +48,7 @@ def destroy_cluster(session, cluster)
 		$redis.hdel idea, "cluster"
 	end
 	$redis.srem "session:#{session}:clusters", "cluster:#{session}:#{cluster}"
+	$redis.del "cluster:#{session}:#{cluster}:ideas"
 	$redis.del "cluster:#{session}:#{cluster}"
 end
 
@@ -132,6 +147,17 @@ end
 delete "/:session/clusters/:id" do
 	destroy_cluster(params[:session], params[:id])
 	""
+end
+
+delete "/:session/clusters/:cluster/ideas/:id" do
+	remove_idea_from_cluster params[:session]), params[:cluster], params[:id]
+	""
+end
+
+post "/:session/clusters/:cluster/ideas/:id" do
+	content_type "application/json"
+	add_idea_to_cluster params[:session]), params[:cluster], params[:id]
+	get_idea(params[:session], params[:id]).to_json
 end
 
 put "/:session/ideas/:id" do

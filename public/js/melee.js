@@ -41,10 +41,11 @@ $(function() {
 	//VIEW FOR CLUSTER MODEL
 	window.ClusterView = Backbone.View.extend({
 		className: 'cluster',
-		expanded: false,
+		expanded: true,
 		template: _.template($('#cluster-template').html()),
 		
 		events : {
+			"hideDetails": "hideIdeas",
 			"click" : "toggleIdeas",
 			"click .cluster-delete": "clear",
 			"mouseover": "showDelete",
@@ -67,16 +68,21 @@ $(function() {
 		},
 		
 		showIdeas: function(){
-			$(this.el).find(".cluster-ideas, .arrow, .arrow-border").show();
+			if(!this.expanded){
+				$(this.el).find(".cluster-ideas, .arrow, .arrow-border").show('blind');
+				this.expanded = true;
+			}
 		},
 		
 		hideIdeas: function(){
-			$(this.el).find(".cluster-ideas, .arrow, .arrow-border").hide();
+			if(this.expanded){
+				$(this.el).find(".cluster-ideas, .arrow, .arrow-border").hide('blind');
+				this.expanded = false;
+			}
 		},
 		
-		toggleIdeas: function() {
-			this.expanded = !this.expanded;
-			if(this.expanded){
+		toggleIdeas: function(){
+			if(!this.expanded){
 				this.model.ideas.fetch();
 			} else {
 				this.hideIdeas();
@@ -100,6 +106,10 @@ $(function() {
 	window.ClusterListView = Backbone.View.extend({
 		template: _.template($('#clusterlistview-template').html()),
 		
+		events : {
+			"click .cluster": "toggleDetails"
+		},
+		
 		initialize: function(){
 			_.bindAll(this, 'render');
 			this.collection.bind('add', this.add);
@@ -119,6 +129,10 @@ $(function() {
 			});
 			
 			return this;
+		},
+		
+		toggleDetails: function(e){
+			$(e.currentTarget).siblings().trigger("hideDetails");
 		},
 		
 		add: function(cluster) {
@@ -171,7 +185,6 @@ $(function() {
 		},
 		
 		render: function(){
-			console.log("rendering idea list");
 			var $ideas, collection = this.collection;
 			
 			$(this.el).html(this.template());
@@ -329,7 +342,27 @@ $(function() {
 		render: function() {
 			$(this.clusterlist).html(this.clusterListView.render().el);
 			$(this.unsortedlist).html(this.unsortedListView.render().el);
+			this.makeDraggable($(this.unsortedListView.el).find('.idea'));
+			this.makeDroppable($(this.clusterListView.el).find('.cluster'));
 			return this;
+		},
+		
+		makeDraggable: function(e) {
+			e.draggable({revert: 'invalid'});
+		},
+		
+		makeDroppable: function(e) {
+			e.droppable({
+				accept: ".idea", 
+				drop: function(ev, ui) {
+					ui.draggable.trigger("cluster");
+					var t = $(this);
+					ui.draggable.hide('scale', {},function(){
+						t.effect('highlight');
+					});
+					$(this).trigger("add");
+				}
+			});
 		},
 		
 		addCluster: function(e){
