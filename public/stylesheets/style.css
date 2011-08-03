@@ -269,7 +269,7 @@ nav {
   /*padding-top: 30px;*/
 
 }
-nav a {
+nav span {
   text-align: right;
   font-size: 12px;
   font-weight: bold;
@@ -279,7 +279,7 @@ nav a {
   background: #222;
   border-bottom: 1px solid #333;
 }
-nav a.current {
+nav span.current {
   background-color: black !important;
   color: yellow;
 }
@@ -365,6 +365,9 @@ nav #menu_export {
 }
 /* cluster */
 #clusterlist, #unsortedlist {
+  clear: both;
+}
+.cluster-separator {
   clear: both;
 }
 .cluster {

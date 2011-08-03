@@ -45,6 +45,7 @@ $(function() {
 		template: _.template($('#cluster-template').html()),
 		
 		events : {
+			"cluster:idea:add": "addIdea",
 			"hideDetails": "hideIdeas",
 			"click" : "toggleIdeas",
 			"click .cluster-delete": "clear",
@@ -53,11 +54,13 @@ $(function() {
 		},
 		
 		initialize: function() {
-			_.bindAll(this, 'render', 'remove', 'toggleIdeas', 'showIdeas');
+			_.bindAll(this, 'render', 'remove', 'showIdeas', 'ideaAdded');
 			this.model.bind('change', this.render);
 			this.model.bind('destroy', this.remove);
 			this.model.ideas.bind('reset', this.showIdeas);
+			this.model.ideas.bind('add', this.ideaAdded);
 			this.idealistview = new IdeaListView({collection : this.model.ideas});
+			this.$separator = $();
 		},
 		
 		render: function() {
@@ -69,14 +72,42 @@ $(function() {
 		
 		showIdeas: function(){
 			if(!this.expanded){
-				$(this.el).find(".cluster-ideas, .arrow, .arrow-border").show('blind');
+				var $siblings = $(this.el).nextAll();
+				var $this_el = $(this.el);
+				var $end_of_line = $this_el;
+				for(var i = 0; i < $siblings.length; i++){
+					//case there is no more elements ahead of this one
+					var $curr = $($siblings[i]);
+					if(i+1 == $siblings.length && $this_el.offset().top == $curr.offset().top){
+						$end_of_line = $curr;
+						break;
+					}else{
+						if(i+1 != $siblings.length && $($siblings[i+1]).offset().top > $this_el.offset().top){
+							$end_of_line = $curr;
+							break;
+						}
+					}
+				}
+				this.$separator = $('<div class="cluster-separator"/>');
+				$end_of_line.after(this.$separator);
+				$this_el.find(".cluster-ideas, .arrow, .arrow-border").show('blindStep', {
+					step : $.proxy(function(now, fx) {
+						this.$separator.height(now);
+					}, this)
+				});
 				this.expanded = true;
 			}
 		},
 		
 		hideIdeas: function(){
 			if(this.expanded){
-				$(this.el).find(".cluster-ideas, .arrow, .arrow-border").hide('blind');
+				$(this.el).find(".cluster-ideas, .arrow, .arrow-border").hide('blindStep', {
+					step : $.proxy(function(now, fx) {
+						this.$separator.height(now);
+					},this)
+				}, $.proxy(function(){
+					this.$separator.remove();
+				}, this));
 				this.expanded = false;
 			}
 		},
@@ -87,6 +118,14 @@ $(function() {
 			} else {
 				this.hideIdeas();
 			}
+		},
+		
+		addIdea: function(ev, idea){
+			$(idea).trigger("cluster:idea:add", this);
+		},
+		
+		ideaAdded: function() {
+			
 		},
 		
 		clear: function() {
@@ -111,7 +150,7 @@ $(function() {
 		},
 		
 		initialize: function(){
-			_.bindAll(this, 'render');
+			_.bindAll(this, 'render', 'add');
 			this.collection.bind('add', this.add);
 			this.collection.bind('reset', this.render);
 		},
@@ -137,7 +176,8 @@ $(function() {
 		
 		add: function(cluster) {
 			var view = new ClusterView({model:cluster});
-			$('#clusterlist').append(view.render().el);
+			$(this.el).append(view.render().el);
+			this.trigger("cluster:add", $(view.el));
 		}
 	});
 		
@@ -146,6 +186,7 @@ $(function() {
 		template: _.template($('#idea-template').html()),
 		
 		events : {
+			"cluster:idea:add": "addToCluster",
 			"click .idea-delete": "clear",
 			"mouseover": "showDelete",
 			"mouseout": "hideDelete"
@@ -172,6 +213,13 @@ $(function() {
 		
 		hideDelete: function() {
 			this.$(".idea-delete").hide();
+		},
+		
+		addToCluster: function(ev, clusterView) {
+			//remove an idea from the collection without triggering the remove event on the whole structure, which would cause backbone to try to destroy the model in the backend.
+			this.model.collection.remove(this.model, {silent: true});
+			//this will trigger a PUT in the backend.
+			clusterView.model.ideas.create(this.model);
 		}
 	});
 	
@@ -179,7 +227,7 @@ $(function() {
 		template: _.template($('#idealistview-template').html()),
 		
 		initialize: function(){
-			_.bindAll(this, 'render');
+			_.bindAll(this, 'render', 'add');
 			this.collection.bind('add', this.add);
 			this.collection.bind('reset', this.render);
 		},
@@ -201,7 +249,7 @@ $(function() {
 		
 		add: function(idea) {
 			var view = new IdeaView({model:idea});
-			$('#idealist').append(view.render().el);
+			$(this.el).append(view.render().el);
 		}
 	});
 	
@@ -275,6 +323,7 @@ $(function() {
 				this.ideaListView = new IdeaListView({
 					collection: this.ideas
 				});
+				this.router.setupNavEvents(opts['session']);
 				this.bootstrapped = true;
 			}
 		},
@@ -326,7 +375,7 @@ $(function() {
 				this.clusterListView = new ClusterListView({
 					collection: this.clusters
 				});
-				
+				this.clusterListView.bind("cluster:add", this.makeDroppable);
 				this.unsortedIdeas = opts['unsortedIdeas'];
 				if (!this.unsortedIdeas) {
 					this.unsortedIdeas = new IdeaList([], {url : "/"+opts['session'].id+"/unsorted"});
@@ -335,6 +384,7 @@ $(function() {
 				this.unsortedListView = new IdeaListView({
 					collection: this.unsortedIdeas
 				});
+				this.router.setupNavEvents(opts['session']);
 				this.bootstrapped = true;
 			}
 		},
@@ -355,12 +405,10 @@ $(function() {
 			e.droppable({
 				accept: ".idea", 
 				drop: function(ev, ui) {
-					ui.draggable.trigger("cluster");
-					var t = $(this);
-					ui.draggable.hide('scale', {},function(){
-						t.effect('highlight');
-					});
-					$(this).trigger("add");
+					ui.draggable.hide('scale', {}, $.proxy(function(){
+						$(this).effect('highlight');
+					}, this));
+					$(this).trigger("cluster:idea:add", ui.draggable);
 				}
 			});
 		},
@@ -401,42 +449,93 @@ $(function() {
 		
 	 	sessionStarted: function(session) {
 			this.opts.session = session;
+			this.setupNavEvents(session);
 		},
 		
 		home: function() {
 			$('nav').hide();
 			this.sessionView.bootstrap(this.opts);
-			this.container.append(this.sessionView.render().el);
+			$content = $('#home');
+			if($content.size()){
+				$content.siblings().hide();
+				$content.show();
+			}else{
+				this.container.children().hide();
+				this.container.append(this.sessionView.render().el);
+			}
 		},
 		
 		ideate: function(id) {
 			this.highlightNav('ideate');
 			this.ideateView.bootstrap(this.opts);
-			this.container.append(this.ideateView.render().el);
+			$content = $('#ideate');
+			if($content.size()){
+				$content.siblings().hide();
+				$content.show();
+			}else{
+				this.container.children().hide();
+				this.container.append(this.ideateView.render().el);
+			}
 		},
 		
 		cluster: function(id) {
 			this.highlightNav('cluster');
 			this.clusterateView.bootstrap(this.opts);
-			this.container.append(this.clusterateView.render().el);
+			$content = $('#cluster');
+			if($content.size()){
+				$content.siblings().hide();
+				$content.show();
+			}else{
+				this.container.children().hide();
+				this.container.append(this.clusterateView.render().el);
+			}
 		},
 		
 		prioritize: function(id) {
 			this.highlightNav('prioritize');
 			this.prioritizeView.bootstrap(this.opts);
-			this.container.append(this.prioritizeView.render().el);
+			$content = $('#prioritize');
+			if($content.size()){
+				$content.siblings().hide();
+				$content.show();
+			}else{
+				this.container.children().hide();
+				this.container.append(this.prioritizeView.render().el);
+			}
 		},
 		
 		exportit: function(id) {
 			this.highlightNav('export');
 			this.exportView.bootstrap(this.opts);
-			this.container.append(this.exportView.render().el);
+			$content = $('#export');
+			if($content.size()){
+				$content.siblings().hide();
+				$content.show();
+			}else{
+				this.container.children().hide();
+				this.container.append(this.exportView.render().el);
+			}
+		},
+		
+		setupNavEvents : function(session) {
+			$('#menu_ideate').click($.proxy(function(){
+				this.navigate(session.id+"/ideate", true);
+			}, this));
+			$('#menu_cluster').click($.proxy(function(){
+				this.navigate(session.id+"/cluster", true);
+			}, this));
+			$('#menu_prioritize').click($.proxy(function(){
+				this.navigate(session.id+"/prioritize", true);
+			}, this));
+			$('#menu_export').click($.proxy(function(){
+				this.navigate(session.id+"/export", true);
+			}, this));
 		},
 		
 		highlightNav : function(view) {
 			$('nav').show();
-			$('nav a#menu_'+view).addClass('current');
-			$('nav a:not(#menu_'+view+')').removeClass('current');
+			$('nav span#menu_'+view).addClass('current');
+			$('nav span:not(#menu_'+view+')').removeClass('current');
 		}
 	});
 });

@@ -150,13 +150,13 @@ delete "/:session/clusters/:id" do
 end
 
 delete "/:session/clusters/:cluster/ideas/:id" do
-	remove_idea_from_cluster params[:session]), params[:cluster], params[:id]
+	remove_idea_from_cluster params[:session], params[:cluster], params[:id]
 	""
 end
 
-post "/:session/clusters/:cluster/ideas/:id" do
+put "/:session/clusters/:cluster/ideas/:id" do
 	content_type "application/json"
-	add_idea_to_cluster params[:session]), params[:cluster], params[:id]
+	add_idea_to_cluster params[:session], params[:cluster], params[:id]
 	get_idea(params[:session], params[:id]).to_json
 end
 
