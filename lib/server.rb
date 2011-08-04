@@ -23,11 +23,17 @@ def get_clusters(id)
 	end
 end
 
+def get_cluster(session, cluster)
+	$redis.hgetall "cluster:#{session}:#{cluster}"
+end
+
 def get_idea(session, idea)
 	$redis.hgetall "idea:#{session}:#{idea}"
 end
 
 def destroy_idea(session, idea)
+	cluster = $redis.hget "idea:#{session}:#{idea}", "cluster"
+	remove_idea_from_cluster(session, cluster.split(":").last, idea) if cluster
 	$redis.zrem "session:#{session}:ideas", "idea:#{session}:#{idea}"
 	$redis.del "idea:#{session}:#{idea}"
 end
@@ -35,11 +41,13 @@ end
 def remove_idea_from_cluster(session, cluster, idea)
 	$redis.srem "cluster:#{session}:#{cluster}:ideas", "idea:#{session}:#{idea}"
 	$redis.hdel "idea:#{session}:#{idea}", "cluster"
+	$redis.hincrby "cluster:#{session}:#{cluster}", "ideas_count", -1
 end
 
 def add_idea_to_cluster(session, cluster, idea)
 	$redis.sadd "cluster:#{session}:#{cluster}:ideas", "idea:#{session}:#{idea}"
 	$redis.hset "idea:#{session}:#{idea}", "cluster", "cluster:#{session}:#{cluster}"
+	$redis.hincrby "cluster:#{session}:#{cluster}", "ideas_count", 1
 end
 
 def destroy_cluster(session, cluster)
@@ -65,6 +73,7 @@ end
 def save_cluster(session, cluster, id = nil)
 	# TODO atomicity
 	cluster[:id] = id || get_new_id("session:#{session}:clusters", false)
+	cluster['ideas_count'] = 0
 	cluster.each do |k,v|
 		$redis.hset "cluster:#{session}:#{cluster[:id]}", k, v
 	end
@@ -139,9 +148,11 @@ get "/:id/clusters" do
 	get_clusters(params[:id]).to_json
 end
 
-delete "/:session/ideas/:id" do
-	destroy_idea(params[:session], params[:id])
-	""
+["/:session/ideas/:id" , "/:session/unsorted/:id"].each do |route|
+	delete route do
+		destroy_idea(params[:session], params[:id])
+		""
+	end
 end
 
 delete "/:session/clusters/:id" do
@@ -170,6 +181,11 @@ put "/:session/clusters/:id" do
 	content_type "application/json"
 	cluster = JSON.parse(request.body.read)
 	save_cluster(params[:session], cluster, params[:id]).to_json
+end
+
+get "/:session/clusters/:id" do
+	content_type "application/json"
+	get_cluster(params[:session], params[:id]).to_json
 end
 
 # Session urls

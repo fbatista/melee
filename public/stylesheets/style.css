@@ -379,9 +379,27 @@ nav #menu_export {
   border-radius: 15px;
 }
 .cluster .cluster-title {
-  font-size: 400%;
+  font-size: 48px;
   color: gray;
   position: relative;
+}
+.cluster .cluster-title .counter {
+  right: -15px;
+  top: -15px;
+  height: 20px;
+  position: absolute;
+  background: darkgray;
+  font-size: 16px;
+  padding: 0px 6px 0px 6px;
+  font-weight: bold;
+  color: white;
+  border-top: 3px groove white;
+  border-left: 3px groove white;
+  border-right: 3px ridge white;
+  border-bottom: 3px ridge white;
+  -moz-border-radius: 20px;
+  border-radius: 20px;
+  cursor: pointer;
 }
 .cluster .cluster-title .arrow, .cluster .cluster-title .arrow-border {
   border-color: transparent transparent black transparent;
@@ -398,10 +416,10 @@ nav #menu_export {
   z-index: 20;
 }
 .cluster .cluster-ideas {
+  display: block;
   position: absolute;
   right: 0px;
   left: 130px;
-  display: block;
   margin-top: 15px;
   border-top: 3px solid black;
   z-index: 10;
