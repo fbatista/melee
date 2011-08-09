@@ -232,10 +232,11 @@ a {
 }
 nav {
   background: #333;
-  position: fixed;
+  position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
+  margin-left: -130px;
   width: 130px;
   background-color: #000000;
   background-repeat: repeat-x;
@@ -266,6 +267,7 @@ nav {
   background-image: linear-gradient(#333333, #000000);
   /* the standard */
 
+  z-index: 5;
   /*padding-top: 30px;*/
 
 }
@@ -295,10 +297,57 @@ nav #menu_prioritize {
 nav #menu_export {
   background: #222222 url("/images/export.png") no-repeat 14px;
 }
+nav #menu_collaborate {
+  bottom: 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: #222222 url("/images/collaborate.png") no-repeat 14px;
+}
+#chat {
+  background: #333;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #000000;
+  background-repeat: repeat-x;
+  background-image: -khtml-gradient(linear, left top, left bottom, from(#333333), to(#000000));
+  /* Konqueror */
+
+  background-image: -moz-linear-gradient(#333333, #000000);
+  /* FF 3.6+ */
+
+  background-image: -ms-linear-gradient(#333333, #000000);
+  /* IE10 */
+
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #333333), color-stop(100%, #000000));
+  /* Safari 4+, Chrome 2+ */
+
+  background-image: -webkit-linear-gradient(#333333, #000000);
+  /* Safari 5.1+, Chrome 10+ */
+
+  background-image: -o-linear-gradient(#333333, #000000);
+  /* Opera 11.10 */
+
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#333333', endColorstr='#000000', GradientType=0);
+  /* IE6 & IE7 */
+
+  -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#333333', endColorstr='#000000', GradientType=0)";
+  /* IE8+ */
+
+  background-image: linear-gradient(#333333, #000000);
+  /* the standard */
+
+  z-index: 1;
+  width: 260px;
+  margin-left: -260px;
+  background: #111;
+}
 #melee {
   background: #eeeeee;
   padding: 40px;
-  margin-left: 130px;
+  position: relative;
 }
 /* ideate */
 .idea {
@@ -419,7 +468,7 @@ nav #menu_export {
   display: block;
   position: absolute;
   right: 0px;
-  left: 130px;
+  left: 0px;
   margin-top: 15px;
   border-top: 3px solid black;
   z-index: 10;
@@ -469,4 +518,110 @@ nav #menu_export {
 }
 .cluster .cluster-ideas h1 {
   display: none;
+}
+#chat .message {
+  margin: 10px;
+  background: #0099ff;
+  color: white;
+  white-space: pre;
+  padding: 5px;
+  position: relative;
+}
+#chat .message .arrow {
+  border: 10px solid #0099ff;
+  position: absolute;
+  z-index: -1;
+}
+#chat .message .author {
+  color: black;
+}
+#chat .message.in {
+  margin-left: 40px;
+}
+#chat .message.in .arrow {
+  right: 5px;
+  border-color: transparent #0099ff transparent transparent;
+  bottom: -5px;
+}
+#chat .message.out {
+  margin-right: 40px;
+}
+#chat .message.out .arrow {
+  left: 5px;
+  border-color: transparent transparent transparent #0099ff;
+  top: -5px;
+}
+#chat #chat_input {
+  position: absolute;
+  height: 40px;
+  bottom: 6px;
+  right: 10px;
+  left: 40px;
+  color: #222;
+  border: none;
+  background: lightgray;
+}
+#chat #chat_input .arrow {
+  border: 10px solid #0099ff;
+  position: absolute;
+  z-index: -1;
+  right: 5px;
+  border-color: transparent #0099ff transparent transparent;
+  bottom: -5px;
+}
+#chat #chat_input .arrow {
+  border-color: transparent lightgray transparent transparent;
+}
+#chat #textarea_chat {
+  position: absolute;
+  border: none;
+  outline: none;
+  background: none;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+#chat #messages {
+  position: absolute;
+  top: 50%;
+  bottom: 46px;
+  right: 0;
+  left: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+#chat #users {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 50%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+#chat #users .user {
+  color: #aaa;
+  padding: 3px;
+}
+#chat .modal {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: black;
+  z-index: 10;
+  opacity: 0.8;
+}
+#chat #change_nickname {
+  display: none;
+  position: absolute;
+  top: 20px;
+  z-index: 11;
+  color: white;
+  text-align: center;
+  left: 0;
+  right: 0;
 }

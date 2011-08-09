@@ -3,28 +3,6 @@
 <head>
 	<meta charset="utf-8">
 	<title>Melee - Brainstorming done right</title>
-		
-	<script src="/js/vendor/jquery-1.6.2.min.js"></script>
-	<script src="/js/vendor/jquery-ui-1.8.14.custom.min.js"></script>
-	<script src="/js/vendor/blind_with_stepping.js"></script>
-	<script src="/js/vendor/underscore.js"></script>
-	<script src="/js/vendor/backbone.js"></script>
-	<!-- MELEE -->
-	<script src="/js/app/models/session.js"></script>
-	<script src="/js/app/models/idea.js"></script>
-	<script src="/js/app/models/idea-list.js"></script>
-	<script src="/js/app/models/cluster.js"></script>
-	<script src="/js/app/models/cluster-list.js"></script>	
-	<script src="/js/app/views/idea.js"></script>
-	<script src="/js/app/views/idea-list.js"></script>
-	<script src="/js/app/views/cluster.js"></script>
-	<script src="/js/app/views/cluster-list.js"></script>
-	<script src="/js/app/routes/session.js"></script>
-	<script src="/js/app/routes/ideate.js"></script>
-	<script src="/js/app/routes/cluster.js"></script>
-	<script src="/js/app/routes/prioritize.js"></script>
-	<script src="/js/app/routes/export.js"></script>
-	<script src="/js/app/routes/router.js"></script>
 	
 	<link href='http://fonts.googleapis.com/css?family=Droid+Sans+Mono' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="/stylesheets/style.css" type="text/css" media="screen" charset="utf-8">
@@ -68,12 +46,11 @@
 		<div id="clusterlist"></div>
 		<div id="unsortedlist"></div>
 	</script>
+	<!-- This one-liner is on purpose, so that white-space: pre; doesn't break. -->
+	<script type="text/template" id="message-template"><div class="arrow"></div><%%= text %><div class="author"><%%= author %></div></script>
 	
-	<script>
-		$(function() {
-			window.melee = new Melee(<%= yield %>);
-			Backbone.history.start({pushState : true});
-		});
+	<script type="text/template" id="user-template">
+		<%%= nickname %><span class="step"> @ <%% print(step || 'ideate'); %></span> | <span class="votes"><%% print(votes || 5); %> votes remaining</span>
 	</script>
 </head>
 
@@ -83,9 +60,60 @@
 		<span id="menu_cluster">Cluster</span>
 		<span id="menu_prioritize">Prioritize</span>
 		<span id="menu_export">Export</span>
+		<span id="menu_collaborate">Collaborate</span>
 	</nav>
-	<div id="melee">
-		
-	</div>	
+	<div id="chat">
+		<div class="modal"></div>
+		<div id="change_nickname">
+			<label>Choose a nickname:</label><br/>
+			<input type="text" placeholder="Anonymous" />
+		</div>
+		<div id="users"></div>
+		<div id="messages"></div>
+		<div id="chat_input">
+			<div class="arrow"></div>
+			<textarea id="textarea_chat" placeholder="type a message"></textarea>
+		</div>
+	</div>
+	<div id="melee"></div>
+	<script src="http://192.168.2.137:8000/socket.io/socket.io.js"></script>
+	<script src="/js/vendor/jquery-1.6.2.min.js"></script>
+	<script src="/js/vendor/jquery-ui-1.8.14.custom.min.js"></script>
+	<script src="/js/vendor/blind_with_stepping.js"></script>
+	<script src="/js/vendor/jquery.ui.touch.js"></script>
+	<script src="/js/vendor/underscore.js"></script>
+	<script src="/js/vendor/backbone.js"></script>
+	<!-- MELEE -->
+	<script src="/js/app/models/socket.js"></script>
+	<script src="/js/app/models/session.js"></script>
+	<script src="/js/app/models/idea.js"></script>
+	<script src="/js/app/models/idea-list.js"></script>
+	<script src="/js/app/models/cluster.js"></script>
+	<script src="/js/app/models/cluster-list.js"></script>
+	<script src="/js/app/models/message.js"></script>
+	<script src="/js/app/models/message-list.js"></script>
+	<script src="/js/app/models/user.js"></script>
+	<script src="/js/app/models/user-list.js"></script>
+	<script src="/js/app/views/idea.js"></script>
+	<script src="/js/app/views/idea-list.js"></script>
+	<script src="/js/app/views/cluster.js"></script>
+	<script src="/js/app/views/cluster-list.js"></script>
+	<script src="/js/app/views/message.js"></script>
+	<script src="/js/app/views/message-list.js"></script>
+	<script src="/js/app/views/user.js"></script>
+	<script src="/js/app/views/user-list.js"></script>
+	<script src="/js/app/routes/session.js"></script>
+	<script src="/js/app/routes/ideate.js"></script>
+	<script src="/js/app/routes/cluster.js"></script>
+	<script src="/js/app/routes/prioritize.js"></script>
+	<script src="/js/app/routes/export.js"></script>
+	<script src="/js/app/routes/chat.js"></script>
+	<script src="/js/app/routes/router.js"></script>
+	<script>
+		$(function() {
+			window.melee = new Melee(<%= yield %>);
+			Backbone.history.start({pushState : true});
+		});
+	</script>
 </body>
 </html>

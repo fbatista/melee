@@ -1,1 +1,5 @@
-{ideas : new IdeaList(<%= @ideas %>, {url:'/<%= @sessionid %>/ideas'}), session : new Session({id : '<%= @sessionid %>'})}
+{
+	ideas : new IdeaList(<%= @ideas %>, {url:'/<%= @sessionid %>/ideas'}),
+	session : new Session({id : '<%= @sessionid %>'}),
+	socket_url : 'http://192.168.2.137:8000'
+}

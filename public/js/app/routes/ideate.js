@@ -27,7 +27,7 @@ $(function(){
 				this.ideaListView = new IdeaListView({
 					collection: this.ideas
 				});
-				this.router.setupNavEvents(opts['session']);
+				this.router.sessionStarted(opts['session']);
 				this.bootstrapped = true;
 			}
 		},

@@ -41,7 +41,7 @@ $(function(){
 				});
 				this.unsortedListView.bind("idea:add", this.makeDraggable);
 				
-				this.router.setupNavEvents(opts['session']);
+				this.router.sessionStarted(opts['session']);
 				this.bootstrapped = true;
 			}
 			//TEMPORARY, MOVE THIS INSIDE THE IF WHEN WE HAVE MULTIPLAYER PUSH
@@ -60,7 +60,7 @@ $(function(){
 		},
 		
 		makeDraggable: function(e) {
-			e.draggable({revert: 'invalid', zIndex: 50});
+			e.draggable({revert: 'invalid', zIndex: 50}).addTouch();
 		},
 		
 		makeDroppable: function(e) {
@@ -72,7 +72,7 @@ $(function(){
 					}, this));
 					$(this).trigger("cluster:idea:add", ui.draggable);
 				}
-			});
+			}).addTouch();
 		},
 		
 		addCluster: function(e){

@@ -20,12 +20,14 @@ a {
 
 nav {
 	background: #333;
-	position: fixed;
+	position: absolute;
 	top: 0;
 	bottom: 0;
 	left: 0;
+	margin-left: -@sb;
 	width: @sb;
 	#gradient > .vertical(#333,#000);
+	z-index: 5;
 	/*padding-top: 30px;*/
 
 	span {
@@ -48,12 +50,32 @@ nav {
 	#menu_cluster { background: #222 url("/images/cluster.png") no-repeat 12px}
 	#menu_prioritize { background: #222 url("/images/prioritize.png") no-repeat 12px}
 	#menu_export { background: #222 url("/images/export.png") no-repeat 14px}
+	#menu_collaborate {
+		bottom: 0;
+		position: absolute;
+		left: 0;
+		right: 0;
+		background: #222 url("/images/collaborate.png") no-repeat 14px;
+	}
+}
+
+#chat {
+	background: #333;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	#gradient > .vertical(#333,#000);
+	z-index: 1;
+	width: 260px;
+	margin-left: -260px;
+	background: #111;
 }
 
 #melee {
 	background: @bg;
 	padding: 40px;
-	margin-left: @sb;
+	position: relative;
 }
 
 /* ideate */
@@ -152,7 +174,7 @@ nav {
 		display: block;
 		position: absolute;
 		right: 0px;
-		left: 130px;
+		left: 0px;
 		margin-top: 15px;
 		border-top: 3px solid black;
 		z-index: 10;
@@ -179,3 +201,126 @@ nav {
 		}
 	}
 }
+
+#chat {
+	.message {
+		margin: 10px;
+		background: #0099ff;
+		color:white;
+		white-space: pre;
+		padding: 5px;
+		position: relative;
+
+		.arrow {
+			border: 10px solid #0099ff;
+			position: absolute;
+			z-index: -1
+		}
+		.author {
+			color:black;
+		}
+	}
+
+	.message.in {
+		margin-left: 40px;
+
+		.arrow {
+			right: 5px;
+			border-color: transparent #0099ff transparent transparent;
+			bottom: -5px
+		}
+	}
+
+	.message.out {
+		margin-right: 40px;
+
+		.arrow {
+			left: 5px;
+			border-color: transparent transparent transparent #0099ff;
+			top: -5px;
+		}
+	}
+
+	#chat_input {
+		position: absolute;
+		height: 40px;
+		bottom: 6px;
+		right: 10px;
+		left: 40px;
+		color: #222;
+		border:none;
+		background:lightgray;
+
+		.arrow {
+			border: 10px solid #0099ff;
+			position: absolute;
+			z-index: -1;
+			right: 5px;
+			border-color: transparent #0099ff transparent transparent;
+			bottom: -5px
+		}
+	}
+
+	#chat_input .arrow {
+		border-color: transparent lightgray transparent transparent;
+	}
+	#textarea_chat {
+		position: absolute;
+		border: none;
+		outline: none;
+		background: none;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+	}
+
+	#messages {
+		position: absolute;
+		top: 50%;
+		bottom: 46px;
+		right: 0;
+		left: 0;
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
+	#users {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 50%;
+		overflow-y: auto;
+		overflow-x: hidden;
+		
+		.user {
+			color: #aaa;
+			padding: 3px;
+		}
+	}
+	
+	.modal {
+		display: none;
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background: black;
+		z-index: 10;
+		opacity: 0.8;
+	}
+	
+	#change_nickname {
+		display: none;
+		position: absolute;
+		top: 20px;
+		z-index: 11;
+		color: white;
+		text-align: center;
+		left: 0;
+		right: 0;
+	}
+}
+
