@@ -32,7 +32,6 @@
 	});
 	
 	rc.on("connect", function() {
-		rc.subscribe("melee:chat");
 		rc.subscribe("melee:data");
 	});
 	
@@ -40,7 +39,7 @@
 	// we send it over to all connected clients
 	rc.on("message", function (channel, message) {
 		//console.log("Sending: " + message);
-		io.sockets.emit('message', message);
+		io.sockets.to().emit('message', message);
 	});
 
 	// so now, for every client that connects to node
@@ -95,7 +94,12 @@
 	 		// nothin'
 			socket.get('sessionid', function(err, sessionid){
 				socket.get('nickname', function(err, nickname){
-					
+					socket.broadcast.to(sessionid).emit("user disconnected", {
+						id : socket.id,
+						nickname : nickname,
+						step : step,
+						votes : votes || null
+					});
 				});
 			});
 	 	});
