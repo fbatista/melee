@@ -11,7 +11,7 @@ $(function(){
 		},
 		
 		initialize : function(){
-			_.bindAll(this, 'askNickname', 'sessionStarted', 'addUser', 'addMessage');
+			_.bindAll(this, 'askNickname', 'sessionStarted', 'addUser', 'updateUser', 'addMessage', 'removeUser');
 			this.textarea = this.$('#textarea_chat');
 			this.chat_input = this.$('#chat_input');
 			this.textarea_arrow = this.$('#chat_input .arrow');
@@ -26,12 +26,22 @@ $(function(){
 			this.change_nickname.show('fade');
 		},
 		
-		sessionStarted : function(users) {
-			this.users.reset(users);
+		addUser : function(user) {
+			if(this.bootstrapped && !this.users.get(user.id)){
+				this.users.add(user);
+			}
 		},
 		
-		addUser : function(user) {
-			this.users.add(user);
+		updateUser : function(user) {
+			if(this.bootstrapped && this.users.get(user.id)){
+				this.users.get(user.id).set(user);
+			}
+		},
+		
+		removeUser : function(user) {
+			if(this.bootstrapped && this.users.get(user.id)){
+				this.users.get(user.id).destroy();
+			}
 		},
 		
 		bootstrap : function(opts) {
@@ -48,8 +58,6 @@ $(function(){
 					el: this.$('#users'),
 					collection: this.users
 				});
-				
-				this.router.sessionStarted(opts['session']);
 				this.bootstrapped = true;
 			}
 		},

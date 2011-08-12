@@ -6,6 +6,7 @@ $(function(){
 		events : {
 			"cluster:idea:add": "addToCluster",
 			"click .idea-delete": "clear",
+			"click .vote": "vote",
 			"mouseover": "showDelete",
 			"mouseout": "hideDelete"
 		},
@@ -25,6 +26,10 @@ $(function(){
 			this.model.destroy();
 		},
 		
+		vote: function(ev){
+			$(this.el).trigger('idea:vote', this);
+		},
+		
 		showDelete: function() {
 			this.$(".idea-delete").show();
 		},
@@ -35,9 +40,15 @@ $(function(){
 		
 		addToCluster: function(ev, clusterView) {
 			//remove an idea from the collection without triggering the remove event on the whole structure, which would cause backbone to try to destroy the model in the backend.
+			this.model.trigger('destroy');
 			this.model.collection.remove(this.model, {silent: true});
 			//this will trigger a PUT in the backend.
-			clusterView.model.ideas.create(this.model);
+			//clusterView.model.ideas.create(this.model);
+			clusterView.model.ideas.add(this.model, {silent: true});
+			this.model.save({}, {success: $.proxy(function(){
+				clusterView.model.ideas.trigger('add', this.model);
+			}, this)});
+			
 		}
 	});
 });

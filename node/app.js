@@ -1,106 +1,108 @@
-
-	var io = require('socket.io').listen(8000),
-		redis = require('redis'),
-		sessions = {},
-		rc = redis.createClient(),
-		rebind = function(fun, newthis){
-			return function() {
-				return fun.apply(newthis, arguments);
-			};
+var io = require('socket.io').listen(8000),
+	redis = require('redis'),
+	sessions = {},
+	rc = redis.createClient(),
+	pubsub = redis.createClient(),
+	rebind = function(fun, newthis){
+		return function() {
+			return fun.apply(newthis, arguments);
 		};
+	};
 
-	io.configure('production', function(){
-		io.enable('browser client minification');
-		io.enable('browser client etag');
-		io.set('log level', 1);
+io.configure('production', function(){
+	io.enable('browser client minification');
+	io.enable('browser client etag');
+	io.set('log level', 1);
 
-		io.set('transports', [
-		  'websocket'
-		, 'flashsocket'
-		, 'htmlfile'
-		, 'xhr-polling'
-		, 'jsonp-polling'
-		]);
-	});
-	
-	io.configure('development', function(){
-	  io.set('transports', ['websocket']);
-	});
-	
-	rc.on("error", function (err) {
-	    console.log("Error " + err);
-	});
-	
-	rc.on("connect", function() {
-		rc.subscribe("melee:data");
-	});
-	
-	// when we get a message in one of the channels we're subscribed to
-	// we send it over to all connected clients
-	rc.on("message", function (channel, message) {
-		//console.log("Sending: " + message);
-		io.sockets.to().emit('message', message);
-	});
+	io.set('transports', [
+	  'websocket'
+	, 'flashsocket'
+	, 'htmlfile'
+	, 'xhr-polling'
+	, 'jsonp-polling'
+	]);
+});
 
-	// so now, for every client that connects to node
-	// though whatever transport (flash, websockets, polling)
-	io.sockets.on('connection', function(socket) { 
-		console.log("new client connected!");
-		socket.on('join session', function(sessionid, step){
-			socket.join(sessionid);
-			socket.set('sessionid', sessionid, function(){
-				socket.set('step', step);
-				socket.emit('ask nickname');
-			});
-		});
-		
-	 	socket.on('set nickname', function(nickname) { 
-	 		socket.set('nickname', nickname, function(){
+io.configure('development', function(){
+  io.set('transports', ['websocket']);
+});
+
+pubsub.on("error", function (err) {
+    console.log("Error " + err);
+});
+
+pubsub.on("connect", function() {
+	pubsub.psubscribe("melee:data:*");
+});
+
+// when we get a message in one of the channels we're subscribed to
+// we send it over to all connected clients
+pubsub.on("pmessage", function (pattern, channel, message) {
+	//console.log("Sending: " + message);
+	var channel_meta = channel.split(":");
+	io.sockets.in(channel_meta[2]).emit(channel_meta[3], JSON.parse(message));
+});
+
+// so now, for every client that connects to node
+// though whatever transport (flash, websockets, polling)
+io.sockets.on('connection', function(socket) { 
+	console.log("new client connected!");
+	socket.emit("welcome", {id: socket.id});
+	
+	socket.on('join session', function(session_id, current_user_id, step){
+		socket.join(session_id);
+		socket.set('sessionid', session_id);
+		socket.set('currentuserid', current_user_id);
+		rc.hset(current_user_id, 'step', step);
+		socket.emit('ask nickname');
+	});
+	
+ 	socket.on('set nickname', function(nickname) { 
+		socket.get('currentuserid', function(err, currentuserid){
+			rc.hset(currentuserid, 'nickname', nickname, function(err, res){
 				socket.get('sessionid', function(err, sessionid){
-					var usernicks = io.sockets.clients(sessionid).map(function(client){
-						return {
-							id: client.id,
-							nickname : client.store.data['nickname'] || null,
-							step : client.store.data['step'] || null,
-							votes : client.store.data['votes'] || null
-						};
-					});
+					var clients = io.sockets.clients(sessionid);
 					console.log("sending nicks of connected users in the room to the new user");
-					socket.emit('session started', usernicks);
-					
-					console.log('broadcasting to '+sessionid+' that '+nickname+' has joined')
-					socket.get('step', function(err, step){
-						socket.get('votes', function(err, votes){
-							socket.broadcast.to(sessionid).emit('user connected', {
-								id : socket.id,
-								nickname : nickname,
-								step : step,
-								votes : votes || null
+					for (var i = 0; i < clients.length; i++){
+						var client = clients[i];
+						client.get('currentuserid', function(err, eachuserid){
+							rc.hgetall(eachuserid, function(err, res){
+								if(res.id == currentuserid){
+									console.log('broadcasting to '+sessionid+' that '+nickname+' has joined');
+									socket.broadcast.to(sessionid).emit('user connected', res);
+								}else {
+									socket.emit('user connected', res);
+								}
 							});
 						});
-					});
+					};
 				});
 			});
-	 	});
-	
-		socket.on('new message', function(message){
-			socket.get('sessionid', function(err, sessionid){
-				message.out = true;
-				socket.broadcast.to(sessionid).emit('new message', message);
+		})
+ 	});
+
+	socket.on('update user state', function(user) {
+		socket.get('sessionid', function(err, sessionid){
+			rc.hmset(user.id, user, function(){
+				socket.broadcast.to(sessionid).emit("user updated", user);
 			});
 		});
+	});
 
-	 	socket.on('disconnect', function() {
-	 		// nothin'
-			socket.get('sessionid', function(err, sessionid){
-				socket.get('nickname', function(err, nickname){
-					socket.broadcast.to(sessionid).emit("user disconnected", {
-						id : socket.id,
-						nickname : nickname,
-						step : step,
-						votes : votes || null
-					});
+	socket.on('new message', function(message){
+		socket.get('sessionid', function(err, sessionid){
+			message.out = true;
+			socket.broadcast.to(sessionid).emit('new message', message);
+		});
+	});
+
+ 	socket.on('disconnect', function() {
+		socket.get('sessionid', function(err, sessionid){
+			socket.get('currentuserid', function(err, currentuserid){
+				rc.hgetall(currentuserid, function(err, res) {
+					socket.broadcast.to(sessionid).emit("user disconnected", res);
 				});
 			});
-	 	});
-	});
+		});
+ 	});
+});

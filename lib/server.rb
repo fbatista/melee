@@ -1,6 +1,9 @@
 require "./lib/init"
 
 disable :logging
+enable :sessions
+set :session_secret, 'melee super top secret session key'
+
 set :root, File.dirname(__FILE__) + "/../"
 
 def get_ideas(session, cluster=nil)
@@ -36,6 +39,8 @@ def destroy_idea(session, idea)
 	remove_idea_from_cluster(session, cluster.split(":").last, idea) if cluster
 	$redis.zrem "session:#{session}:ideas", "idea:#{session}:#{idea}"
 	$redis.del "idea:#{session}:#{idea}"
+	return cluster.split(":").last if cluster
+	return nil
 end
 
 def remove_idea_from_cluster(session, cluster, idea)
@@ -109,23 +114,43 @@ def get_new_session
 	return key
 end
 
+def get_or_create_user(session_object, session_id)
+	unless(session_object[session_id][:userid])
+		puts "CREATING A NEW USER ID; for #{session_id}"
+		session_object[session_id][:userid] = get_new_id("session:#{session_id}:users", false)
+		$redis.sadd "session:#{session_id}:users", "user:#{session_id}:#{session_object[session_id][:userid]}"
+		$redis.hset "user:#{session_id}:#{session_object[session_id][:userid]}", "votes", 5
+		$redis.hset "user:#{session_id}:#{session_object[session_id][:userid]}", "id", "user:#{session_id}:#{session_object[session_id][:userid]}"
+	end
+	$redis.hgetall "user:#{session_id}:#{session_object[session_id][:userid]}"
+end
+
+before "/:sessionid/*" do 
+	puts "CALLING BEFORE FILTER => #{params.inspect}"
+	@sessionid = params[:sessionid]
+	session[@sessionid] ||= {}
+	@current_user = get_or_create_user session, @sessionid
+end
+
 post "/" do
 	content_type "application/json"
-	k = get_new_session
-	puts k
-	{:id => k}.to_json
+	{:id => get_new_session}.to_json
 end
 
 post "/:id/ideas" do
 	content_type "application/json"
 	idea = JSON.parse(request.body.read)
-	save_idea(params[:id], idea).to_json
+	idea_json = save_idea(params[:id], idea).to_json
+	$redis.publish "melee:data:#{params[:id]}:new idea", idea_json
+	idea_json
 end
 
 post "/:id/clusters" do
 	content_type "application/json"
 	cluster = JSON.parse(request.body.read)
-	save_cluster(params[:id], cluster).to_json
+	cluster_json = save_cluster(params[:id], cluster).to_json
+	$redis.publish "melee:data:#{params[:id]}:new cluster", cluster_json
+	cluster_json
 end
 
 get "/:id/ideas" do
@@ -133,9 +158,9 @@ get "/:id/ideas" do
 	get_ideas(params[:id]).to_json
 end
 
-get "/:session/clusters/:id/ideas" do
+get "/:sessionid/clusters/:id/ideas" do
 	content_type "application/json"
-	get_ideas(params[:session], params[:id]).to_json
+	get_ideas(params[:sessionid], params[:id]).to_json
 end
 
 get "/:id/unsorted" do
@@ -148,44 +173,54 @@ get "/:id/clusters" do
 	get_clusters(params[:id]).to_json
 end
 
-["/:session/ideas/:id" , "/:session/unsorted/:id"].each do |route|
+["/:sessionid/ideas/:id" , "/:session/unsorted/:id"].each do |route|
 	delete route do
-		destroy_idea(params[:session], params[:id])
+		cluster = destroy_idea(params[:sessionid], params[:id])
+		$redis.publish "melee:data:#{params[:session]}:destroy idea", {:id => params[:id], :cluster => cluster}.to_json
 		""
 	end
 end
 
-delete "/:session/clusters/:id" do
-	destroy_cluster(params[:session], params[:id])
+delete "/:sessionid/clusters/:id" do
+	destroy_cluster(params[:sessionid], params[:id])
+	$redis.publish "melee:data:#{params[:session]}:destroy cluster", {:id => params[:id]}.to_json
 	""
 end
 
-delete "/:session/clusters/:cluster/ideas/:id" do
-	remove_idea_from_cluster params[:session], params[:cluster], params[:id]
+delete "/:sessionid/clusters/:cluster/ideas/:id" do
+	remove_idea_from_cluster params[:sessionid], params[:cluster], params[:id]
+	$redis.publish "melee:data:#{params[:session]}:remove idea from cluster", {:cluster => params[:cluster], :id => params[:id]}.to_json
 	""
 end
 
-put "/:session/clusters/:cluster/ideas/:id" do
+put "/:sessionid/clusters/:cluster/ideas/:id" do
 	content_type "application/json"
-	add_idea_to_cluster params[:session], params[:cluster], params[:id]
-	get_idea(params[:session], params[:id]).to_json
+	add_idea_to_cluster params[:sessionid], params[:cluster], params[:id]
+	idea_json = get_idea(params[:sessionid], params[:id]).to_json
+	$redis.publish "melee:data:#{params[:session]}:move to cluster", idea_json
+	idea_json
 end
 
-put "/:session/ideas/:id" do
+put "/:sessionid/ideas/:id" do
 	content_type "application/json"
 	idea = JSON.parse(request.body.read)
-	save_idea(params[:session], idea, params[:id]).to_json
+	save_idea(params[:sessionid], idea, params[:id]).to_json
 end
 
-put "/:session/clusters/:id" do
+put "/:sessionid/clusters/:id" do
 	content_type "application/json"
 	cluster = JSON.parse(request.body.read)
-	save_cluster(params[:session], cluster, params[:id]).to_json
+	save_cluster(params[:sessionid], cluster, params[:id]).to_json
 end
 
-get "/:session/clusters/:id" do
+get "/:sessionid/clusters/:id" do
 	content_type "application/json"
-	get_cluster(params[:session], params[:id]).to_json
+	get_cluster(params[:sessionid], params[:id]).to_json
+end
+
+get "/:id/user" do
+	content_type "application/json"
+	@current_user.to_json
 end
 
 # Session urls
@@ -200,18 +235,17 @@ end
 
 get "/:id/ideate" do
 	@ideas = get_ideas(params[:id]).to_json
-	@sessionid = params[:id]
 	erb :ideate
 end
 
 get "/:id/cluster" do
 	@unsorted = get_unsorted(params[:id]).to_json
-	@sessionid = params[:id]
 	@clusters = get_clusters(params[:id]).to_json
 	erb :cluster
 end
 
 get "/:id/prioritize" do
+	@clusters = get_clusters(params[:id]).to_json
 	erb :prioritize
 end
 

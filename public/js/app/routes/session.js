@@ -9,7 +9,7 @@ $(function(){
 		},
 
 		initialize : function() {
-			_.bindAll(this, "start", "render");
+			_.bindAll(this, "start", "render", "proceed");
 			this.template = _.template($('#startsession-template').html());
 			$(this.el).html(this.template());
 			this.startButton = this.$('#new-session');
@@ -19,7 +19,7 @@ $(function(){
 			if(!this.bootstrapped){
 				this.router = opts.router;
 				this.model = opts['session'] || new Session();
-				this.model.bind("change", this.model.proceed);
+				this.model.bind("change", this.proceed);
 				this.bootstrapped = true;
 			}
 		},
@@ -33,10 +33,15 @@ $(function(){
 			if(this.model.isNew()){
 				this.model.save();
 			}else{
-				this.model.proceed();
+				this.proceed();
 			}
+		}, 
+		
+		proceed : function() {
 			this.remove();
-			this.router.sessionStarted(this.model);
+			this.router.sessionStarted(this.model, $.proxy(function(){
+				this.router.navigate(this.model.id+"/ideate", true);
+			}, this));
 		}
 	});
 });

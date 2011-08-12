@@ -13,6 +13,7 @@ $(function(){
 		},
 		
 		initialize: function(opts) {
+			_.bindAll(this, 'updateCurrentUserState');
 			this.opts = opts || {};
 			this.opts.router = this;
 			this.chat_container = $('#chat');
@@ -21,30 +22,60 @@ $(function(){
 			this.sessionView = new SessionView();
 			this.ideateView = new IdeateView();
 			this.clusterateView = new ClusterateView();
-			//this.prioritizeView = new PrioritizeView();
+			this.prioritizeView = new PrioritizeView();
 			//this.exportView = new ExportView();
 		},
 		
-	 	sessionStarted: function(session) {
-			if(!this['socket']){
-				this.initSocket(session);
+	 	sessionStarted: function(session, userSuccessCallback) {
+			if(!this['current_user']){
+				this.current_user = new User();
+				this.current_user.url = '/'+session.id+'/user';
+				this.current_user.sync = Backbone.sync;
+				this.current_user.bind('change', this.updateCurrentUserState);
+				this.current_user.fetch({silent: true, success : $.proxy(function(){
+					if(!this['socket']){
+						this.initSocket(session, this.current_user);
+					}
+					userSuccessCallback();
+				}, this)});
+				this.opts.session = session;
+				this.setupNavEvents(session);
+			} else {
+				userSuccessCallback();
 			}
-			this.opts.session = session;
-			this.setupNavEvents(session);
 		},
 		
-		initSocket : function(session) {
+		updateCurrentUserState : function() {
+			this.socket.updateUserState(this.current_user);
+		},
+		
+		initSocket : function(session, user) {
 			this.socket = new SocketHandler(this.opts, {
+				onWelcome : session.setUserId,
 				onAskNickname : this.chatView.askNickname,
 				onSessionStarted : this.chatView.sessionStarted,
 				onUserConnected : this.chatView.addUser,
-				onNewMessageIn : this.chatView.addMessage
+				onUserDisconnected : this.chatView.removeUser,
+				onUserUpdated : this.chatView.updateUser,
+				onNewMessageIn : this.chatView.addMessage,
+				onNewCluster : this.clusterateView.onNewCluster,
+				onMoveToCluster : this.clusterateView.onMoveToCluster,
+				onDestroyIdea : $.proxy(function(idea) {
+					this.ideateView.onDestroyIdea(idea);
+					this.clusterateView.onDestroyIdea(idea);
+				}, this),
+				onDestroyCluster : this.clusterateView.onDestroyCluster,
+				onRemoveIdeaFromCluster : this.clusterateView.onRemoveIdeaFromCluster,
+				onNewIdea : $.proxy(function(idea) {
+					this.ideateView.onNewIdea(idea);
+					this.clusterateView.onNewIdea(idea);
+				}, this)
 			});
 
 			this.chatView.bind('chat:changenick', $.proxy(this.socket.setNickname, this.socket));
 			this.chatView.bind('chat:newmessage', $.proxy(this.socket.newMessage, this.socket));
 			this.socket.connect();
-			this.socket.joinSession(session.id, this.currentStep);
+			this.socket.joinSession(session.id, user.id, this.currentStep);
 		},
 		
 		home: function() {

@@ -12,6 +12,7 @@
 		<span class="idea-title">
 			<%%= title %>
 		</span>
+		<span class="vote">&#x2714;</span>
 	</script>
 	
 	<script type="text/template" id="cluster-template">
@@ -45,6 +46,11 @@
 		<input type="text" name="idea" id="new-cluster" placeholder="Add a cluster">
 		<div id="clusterlist"></div>
 		<div id="unsortedlist"></div>
+	</script>
+	
+	<script type="text/template" id="prioritizeview-template">
+		<h1>You have <span id="remaining-votes">5</span> votes remaining.</h1>
+		<div id="p-clusterlist"></div>
 	</script>
 	<!-- This one-liner is on purpose, so that white-space: pre; doesn't break. -->
 	<script type="text/template" id="message-template"><div class="arrow"></div><%%= text %><div class="author"><%%= author %></div></script>

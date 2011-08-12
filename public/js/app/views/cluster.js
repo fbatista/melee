@@ -14,21 +14,22 @@ $(function(){
 		},
 		
 		initialize: function() {
-			_.bindAll(this, 'render', 'remove', 'showIdeas', 'ideaAdded', 'updateCounter');
+			_.bindAll(this, 'render', 'remove', 'showIdeas', 'modelFetch', 'updateCounter');
 			this.model.bind('change', this.updateCounter);
 			this.model.bind('destroy', this.remove);
 			this.idealistview = new IdeaListView({collection : this.model.ideas});
 			this.model.ideas.bind('reset', this.showIdeas);
-			this.model.ideas.bind('add', this.ideaAdded);
+			this.model.ideas.bind('add', this.modelFetch);
+			this.model.ideas.bind('remove', this.modelFetch);
 			this.$separator = $();
 		},
 		
-		ideaAdded: function() {
+		modelFetch: function() {
 			//this should change probably
 			this.model.fetch();
 		},
 		
-		updateCounter: function() {
+		updateCounter: function(ev) {
 			this.$('.counter').text(this.model.get('ideas_count'));
 		},
 		

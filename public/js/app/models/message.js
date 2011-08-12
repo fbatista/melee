@@ -1,12 +1,6 @@
 $(function(){
-	window.Backbone.socketSync = function(method, model, options) {
-		console.log("sending through socket...");
-		console.log("method -> "+method);
-		console.log("model -> "+model);
-		console.log("options -> "+options);
-		
+	window.Backbone.socketSync = function(method, model, options) {		
 		setTimeout(function(){
-			console.log("sending success...");
 			options.success(model);
 		}, 10);
 	};

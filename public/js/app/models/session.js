@@ -2,9 +2,12 @@ $(function() {
 	window.Session = Backbone.Model.extend({
 		url : '/',
 		
-		proceed : function() {
-			window.session = this;
-			melee.navigate(this.id+"/ideate", true);
+		setUserid : function (data) {
+			this.set("userid", data.id);
+		},
+		
+		getUserid : function() {
+			return this.get('userid');
 		}
 	});	
 });
