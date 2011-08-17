@@ -18,7 +18,7 @@ $(function(){
 			this.model.bind('change', this.updateCounter);
 			this.model.bind('destroy', this.remove);
 			this.idealistview = new IdeaListView({collection : this.model.ideas});
-			this.model.ideas.bind('reset', this.showIdeas);
+			//this.model.ideas.bind('reset', this.showIdeas);
 			this.model.ideas.bind('add', this.modelFetch);
 			this.model.ideas.bind('remove', this.modelFetch);
 			this.$separator = $();
@@ -84,7 +84,7 @@ $(function(){
 		
 		toggleIdeas: function(){
 			if(!this.expanded){
-				this.model.ideas.fetch();
+				this.model.ideas.fetch({success : this.showIdeas});
 			} else {
 				this.hideIdeas();
 			}
