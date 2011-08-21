@@ -15,6 +15,10 @@ def get_ideas(session, cluster=nil)
 	end
 end
 
+def get_votes(user)
+	$redis.smembers "#{user}:votes"
+end
+
 def get_unsorted(id)
 	get_ideas(id).select do |idea|
 		idea['cluster'].nil?
@@ -118,7 +122,6 @@ end
 
 def get_or_create_user(session_object, session_id)
 	unless(session_object[session_id][:userid])
-		puts "CREATING A NEW USER ID; for #{session_id}"
 		session_object[session_id][:userid] = get_new_id("session:#{session_id}:users", false)
 		$redis.sadd "session:#{session_id}:users", "user:#{session_id}:#{session_object[session_id][:userid]}"
 		$redis.hset "user:#{session_id}:#{session_object[session_id][:userid]}", "votes", 5
@@ -128,7 +131,6 @@ def get_or_create_user(session_object, session_id)
 end
 
 before "/:sessionid/*" do 
-	puts "CALLING BEFORE FILTER => #{params.inspect}"
 	@sessionid = params[:sessionid]
 	session[@sessionid] ||= {}
 	@current_user = get_or_create_user session, @sessionid
@@ -163,6 +165,11 @@ end
 get "/:sessionid/clusters/:id/ideas" do
 	content_type "application/json"
 	get_ideas(params[:sessionid], params[:id]).to_json
+end
+
+get "/:sessionid/user/ideas" do
+	content_type "application/json"
+	get_votes(@current_user["id"]).to_json
 end
 
 get "/:id/unsorted" do

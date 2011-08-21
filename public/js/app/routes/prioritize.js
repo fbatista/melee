@@ -48,15 +48,17 @@ $(function(){
 		},
 		
 		vote: function(ev, ideaView) {
-			if(this.router.current_user.ideas.get(ideaView.model.id)){
+			var idea_id = "idea:"+this.router.opts.session.id+":"+ideaView.model.id;
+			if(this.router.current_user.votes.get(idea_id)){
 				//remove vote
-				this.router.current_user.ideas.remove(this.router.current_user.ideas.get(ideaView.model.id));
+				this.router.current_user.votes.get(idea_id).destroy({socket : this.router.socket});
+				//this.router.current_user.votes.remove(this.router.current_user.votes.get(idea_id), {socket : this.router.socket});
 				ideaView.$('.vote').animate({backgroundColor : '#999999'}, 350);
 				this.router.current_user.set({votes : (this.router.current_user.get('votes') + 1)});
 			} else {
 				//add vote
 				if(this.router.current_user.get('votes') > 0){
-					this.router.current_user.ideas.add(ideaView.model);
+					this.router.current_user.votes.create({idea : idea_id}, {socket : this.router.socket});
 					this.router.current_user.set({votes : (this.router.current_user.get('votes') - 1)});
 					ideaView.$('.vote').animate({backgroundColor : '#00ff00'}, 350);
 				}

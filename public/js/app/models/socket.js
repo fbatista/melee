@@ -59,6 +59,16 @@ $(function(){
 				this.socket.emit('update user state', user.toJSON());
 			},
 			
+			addVote : function(ideaid){
+				console.log("sending add vote " + ideaid);
+				this.socket.emit('add vote', ideaid);
+			},
+			
+			removeVote : function(ideaid){
+				console.log("sending remove vote " + ideaid);
+				this.socket.emit('remove vote', ideaid);
+			},
+			
 			//upstream
 			
 			welcome : function(data) {

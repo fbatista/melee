@@ -95,6 +95,26 @@ io.sockets.on('connection', function(socket) {
 			socket.broadcast.to(sessionid).emit('new message', message);
 		});
 	});
+	
+	socket.on('remove vote', function(idea){
+		//remove vote on idea, from current user
+		socket.get('sessionid', function(err, sessionid){
+			rc.zincrby('session:'+sessionid+':ideas', -1, idea);
+			socket.get('currentuserid', function(err, currentuserid){
+				rc.srem(currentuserid + ':votes', idea);
+			});
+		});
+	});
+	
+	socket.on('add vote', function(idea){
+		//add vote on idea, from current user
+		socket.get('sessionid', function(err, sessionid){
+			rc.zincrby('session:'+sessionid+':ideas', 1, idea);
+			socket.get('currentuserid', function(err, currentuserid){
+				rc.sadd(currentuserid + ':votes', idea);
+			});
+		});
+	});
 
  	socket.on('disconnect', function() {
 		socket.get('sessionid', function(err, sessionid){
