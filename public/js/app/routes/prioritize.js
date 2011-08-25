@@ -27,18 +27,19 @@ $(function(){
 				this.router = opts.router;
 				this.clusters = opts['clusters'];
 				if (!this.clusters) {
-					this.clusters = new ClusterList([], {url : "/"+opts['session'].id+"/clusters"});
+					this.clusters = new ClusterList([], {url : "/"+opts.session.id+"/clusters"});
 				}
 				this.clusterListView = new ClusterListView({
 					collection: this.clusters
 				});
-
+				
 				this.router.sessionStarted(opts['session'], $.proxy(function(){
 					this.clusters.fetch();
 					this.updateVoteCounter();
 					this.router.current_user.set({step: 'Prioritize'});
 					this.router.current_user.bind('change:votes', this.updateVoteCounter, this);
 				},this));
+				
 				this.bootstrapped = true;
 			}
 		},
@@ -52,7 +53,6 @@ $(function(){
 			if(this.router.current_user.votes.get(idea_id)){
 				//remove vote
 				this.router.current_user.votes.get(idea_id).destroy({socket : this.router.socket});
-				//this.router.current_user.votes.remove(this.router.current_user.votes.get(idea_id), {socket : this.router.socket});
 				ideaView.$('.vote').animate({backgroundColor : '#999999'}, 350);
 				this.router.current_user.set({votes : (this.router.current_user.get('votes') + 1)});
 			} else {
@@ -67,6 +67,8 @@ $(function(){
 		
 		render: function() {
 			$(this.clusterlist).html(this.clusterListView.render().el);
+			//initialize saved votes from bootstrap
+			//this.router.current_user.votes
 			return this;
 		},
 		
@@ -77,10 +79,6 @@ $(function(){
 		/*
 		S O C K E T   E V E N T S
 		*/
-		onAddVote: function() {
-			
-		},
-		
 		onNewCluster : function(cluster) {
 			if(this.bootstrapped && !this.clusters.get(cluster.id)){
 				this.clusters.add(cluster);

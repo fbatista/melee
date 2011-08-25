@@ -15,8 +15,14 @@ def get_ideas(session, cluster=nil)
 	end
 end
 
-def get_votes(user)
+def get_voted_ideas(user)
 	$redis.smembers "#{user}:votes"
+end
+
+def get_votes(user)
+	get_voted_ideas(user).map do |id|
+		$redis.hgetall id
+	end
 end
 
 def get_unsorted(id)
@@ -255,6 +261,7 @@ end
 
 get "/:id/prioritize" do
 	@clusters = get_clusters(params[:id]).to_json
+	@votes = get_votes(@current_user["id"]).to_json
 	erb :prioritize
 end
 

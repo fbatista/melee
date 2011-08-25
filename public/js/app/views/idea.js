@@ -12,7 +12,8 @@ $(function(){
 		},
 		
 		initialize: function() {
-			_.bindAll(this, 'render', 'remove');
+			_.bindAll(this, 'render', 'remove', 'bootstrapVote');
+			this.model.bind('bootstrap:vote', this.bootstrapVote);
 			this.model.bind('change', this.render);
 			this.model.bind('destroy', this.remove);
 		},
@@ -28,6 +29,10 @@ $(function(){
 		
 		vote: function(ev){
 			$(this.el).trigger('idea:vote', this);
+		},
+		
+		bootstrapVote: function() {
+			this.$('.vote').css({backgroundColor : '#00ff00'});
 		},
 		
 		showDelete: function() {

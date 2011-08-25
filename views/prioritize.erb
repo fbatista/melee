@@ -1,5 +1,6 @@
 {
 	session : new Session({id : '<%= @sessionid %>'}),
 	clusters : new ClusterList(<%= @clusters %>, {url:'/<%= @sessionid %>/clusters'}),
+	votes : new VoteList(<%= @votes %>, {url: '/<%= @sessionid %>/user/ideas'}),
 	socket_url : 'http://<%=SOCKET_IO_HOST%>'
 }

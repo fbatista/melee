@@ -103,7 +103,6 @@ io.sockets.on('connection', function(socket) {
 			socket.get('currentuserid', function(err, currentuserid){
 				rc.srem(currentuserid + ':votes', idea);
 			});
-			//make this send all the idea attributes
 			rc.hgetall(idea, function(err, idea_json){
 				socket.broadcast.to(sessionid).emit("vote retracted", idea_json);
 			});
@@ -117,7 +116,6 @@ io.sockets.on('connection', function(socket) {
 			socket.get('currentuserid', function(err, currentuserid){
 				rc.sadd(currentuserid + ':votes', idea);
 			});
-			//make this send all the idea attributes
 			rc.hgetall(idea, function(err, idea_json){
 				socket.broadcast.to(sessionid).emit("vote received", idea_json);
 			});
