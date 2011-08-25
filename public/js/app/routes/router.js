@@ -70,7 +70,17 @@ $(function(){
 				onNewIdea : $.proxy(function(idea) {
 					this.ideateView.onNewIdea(idea);
 					this.clusterateView.onNewIdea(idea);
-				}, this)
+				}, this),
+				onVoteReceived : function(data){
+					//TODO this should be a function on the export view
+					console.log("vote received");
+					console.log(data);
+				},
+				onVoteRetracted : function(data){
+					//TODO this should be a function on the export view
+					console.log("vote retracted");
+					console.log(data);
+				}
 			});
 
 			this.chatView.bind('chat:changenick', $.proxy(this.socket.setNickname, this.socket));

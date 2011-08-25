@@ -26,7 +26,9 @@ $(function(){
 					'destroyIdea',
 					'destroyCluster',
 					'removeIdeaFromCluster',
-					'userUpdated');
+					'userUpdated',
+					'voteReceived',
+					'voteRetracted');
 				this.socket.on("welcome", this.welcome);
 				this.socket.on("ask nickname", this.askNickname);
 				this.socket.on("user connected", this.userConnected);
@@ -39,6 +41,8 @@ $(function(){
 				this.socket.on("destroy idea", this.destroyIdea);
 				this.socket.on("destroy cluster", this.destroyCluster);
 				this.socket.on("remove idea from cluster", this.removeIdeaFromCluster);
+				this.socket.on("vote received", this.voteReceived);
+				this.socket.on("vote retracted", this.voteRetracted);
 			},
 			
 			//downstream
@@ -60,12 +64,10 @@ $(function(){
 			},
 			
 			addVote : function(ideaid){
-				console.log("sending add vote " + ideaid);
 				this.socket.emit('add vote', ideaid);
 			},
 			
 			removeVote : function(ideaid){
-				console.log("sending remove vote " + ideaid);
 				this.socket.emit('remove vote', ideaid);
 			},
 			
@@ -140,6 +142,18 @@ $(function(){
 			userUpdated : function(data) {
 				if(this.callbacks['onUserUpdated']) {
 					this.callbacks.onUserUpdated(data);
+				}
+			},
+			
+			voteReceived : function(data) {
+				if(this.callbacks['onVoteReceived']) {
+					this.callbacks.onVoteReceived(data);
+				}
+			},
+			
+			voteRetracted : function(data) {
+				if(this.callbacks['onVoteRetracted']) {
+					this.callbacks.onVoteRetracted(data);
 				}
 			}
 		};
