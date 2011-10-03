@@ -34,7 +34,11 @@ $(function(){
 				});
 				
 				this.router.sessionStarted(opts['session'], $.proxy(function(){
-					this.clusters.fetch();
+					this.clusters.fetch({success: $.proxy(function(collection, response){
+						collection.each($.proxy(function(cluster){
+							this.bindIdeasDisplay(cluster);
+						}, this));
+					},this)});
 					this.updateVoteCounter();
 					this.router.current_user.set({step: 'Prioritize'});
 					this.router.current_user.bind('change:votes', this.updateVoteCounter, this);
@@ -67,9 +71,20 @@ $(function(){
 		
 		render: function() {
 			$(this.clusterlist).html(this.clusterListView.render().el);
-			//initialize saved votes from bootstrap
-			//this.router.current_user.votes
 			return this;
+		},
+
+		bindIdeasDisplay: function(cluster) {
+			cluster.bind("cluster:ideas:shown", function(){
+				this.router.current_user.votes.each($.proxy(function(voted_idea){
+					var idea_id = voted_idea.get('idea').split(":")[2];
+					cluster.ideas.each(function(idea){
+						if (idea.id === idea_id) {
+							idea.trigger('bootstrap:vote');
+						}
+					});
+				},this));
+			}, this);
 		},
 		
 		proceed: function() {
@@ -82,6 +97,7 @@ $(function(){
 		onNewCluster : function(cluster) {
 			if(this.bootstrapped && !this.clusters.get(cluster.id)){
 				this.clusters.add(cluster);
+				this.bindIdeasDisplay(cluster);
 			}
 		},
 		

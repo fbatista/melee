@@ -46,7 +46,6 @@ pubsub.on("pmessage", function (pattern, channel, message) {
 // so now, for every client that connects to node
 // though whatever transport (flash, websockets, polling)
 io.sockets.on('connection', function(socket) { 
-	console.log("new client connected!");
 	socket.emit("welcome", {id: socket.id});
 	
 	socket.on('join session', function(session_id, current_user_id, step){
@@ -62,13 +61,11 @@ io.sockets.on('connection', function(socket) {
 			rc.hset(currentuserid, 'nickname', nickname, function(err, res){
 				socket.get('sessionid', function(err, sessionid){
 					var clients = io.sockets.clients(sessionid);
-					console.log("sending nicks of connected users in the room to the new user");
 					for (var i = 0; i < clients.length; i++){
 						var client = clients[i];
 						client.get('currentuserid', function(err, eachuserid){
 							rc.hgetall(eachuserid, function(err, res){
 								if(res.id == currentuserid){
-									console.log('broadcasting to '+sessionid+' that '+nickname+' has joined');
 									socket.broadcast.to(sessionid).emit('user connected', res);
 								}else {
 									socket.emit('user connected', res);

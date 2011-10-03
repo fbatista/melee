@@ -29,7 +29,12 @@ $(function(){
 	 	sessionStarted: function(session, userSuccessCallback) {
 			if(!this['current_user']){
 				this.current_user = new User();
-				this.current_user.votes = this.opts.votes || new VoteList([], {url : '/'+session.id+'/user/ideas'});
+				if (this.opts.votes) {
+					this.current_user.votes = this.opts.votes;	
+				} else {
+					this.current_user.votes = new VoteList([], {url : '/'+session.id+'/user/ideas'});
+					this.current_user.votes.fetch();
+				}
 				this.current_user.url = '/'+session.id+'/user';
 				this.current_user.sync = Backbone.sync;
 				this.current_user.bind('change', this.updateCurrentUserState);

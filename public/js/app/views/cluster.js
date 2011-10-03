@@ -66,6 +66,7 @@ $(function(){
 					}, this)
 				});
 				this.expanded = true;
+				this.model.trigger('cluster:ideas:shown');
 			}
 		},
 		

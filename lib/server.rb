@@ -21,7 +21,7 @@ end
 
 def get_votes(user)
 	get_voted_ideas(user).map do |id|
-		$redis.hgetall id
+		{:idea => id, :id => id, :idea_model => $redis.hgetall(id)}
 	end
 end
 
@@ -133,7 +133,10 @@ def get_or_create_user(session_object, session_id)
 		$redis.hset "user:#{session_id}:#{session_object[session_id][:userid]}", "votes", 5
 		$redis.hset "user:#{session_id}:#{session_object[session_id][:userid]}", "id", "user:#{session_id}:#{session_object[session_id][:userid]}"
 	end
-	$redis.hgetall "user:#{session_id}:#{session_object[session_id][:userid]}"
+	tmp = $redis.hgetall "user:#{session_id}:#{session_object[session_id][:userid]}"
+	# fix for redis results coming back as strings all the time
+	tmp["votes"] = tmp["votes"].to_i
+	return tmp
 end
 
 before "/:sessionid/*" do 
