@@ -27,13 +27,14 @@ $(function(){
 					return idea.get('score') * -1;
 				}
 				this.resultListView = new IdeaListView({
-					title: "Result Ideas",
+					title: "Ideas, ordered by score:",
 					collection: this.resultIdeas
 				});
 
 				this.router.sessionStarted(opts['session'], $.proxy(function(){
 					this.resultIdeas.fetch();
 					this.router.current_user.set({step: 'Export'});
+					this.updateLink();
 				},this));
 
 				this.bootstrapped = true;
