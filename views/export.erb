@@ -1,0 +1,5 @@
+{
+	resultIdeas : new IdeaList(<%= @results %>, {url:'/<%= @sessionid %>/results'}), 
+	session : new Session({id : '<%= @sessionid %>'}),
+	socket_url : 'http://<%=SOCKET_IO_HOST%>'
+}

@@ -405,6 +405,26 @@ nav #menu_collaborate {
   float: right;
   cursor: pointer;
 }
+.idea .idea-score {
+  display: none;
+  margin-right: -20px;
+  margin-top: -20px;
+  height: 20px;
+  min-width: 20px;
+  float: right;
+  background: #009900;
+  color: white;
+  font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  line-height: 20px;
+  text-align: center;
+  vertical-align: bottom;
+  border: 3px solid white;
+  -moz-border-radius: 20px;
+  border-radius: 20px;
+  -webkit-box-shadow: 0px 0px 1px 1px rgba(0, 100, 0, 0.3);
+  -moz-box-shadow: 0px 0px 1px 1px rgba(0, 100, 0, 0.3);
+  box-shadow: 0px 0px 1px 1px rgba(0, 100, 0, 0.3);
+}
 .idea .vote {
   position: absolute;
   display: none;
@@ -542,26 +562,26 @@ nav #menu_collaborate {
 }
 #chat .message {
   margin: 10px;
-  background: #ffaa33;
-  color: white;
-  white-space: pre;
+  background: #ebe609;
+  color: #505050;
+  white-space: pre-wrap;
   padding: 5px;
   position: relative;
 }
 #chat .message .arrow {
-  border: 10px solid #ffaa33;
+  border: 10px solid #ebe609;
   position: absolute;
   z-index: -1;
 }
 #chat .message .author {
-  color: black;
+  color: #111;
 }
 #chat .message.in {
   margin-left: 40px;
 }
 #chat .message.in .arrow {
   right: 5px;
-  border-color: transparent #ffaa33 transparent transparent;
+  border-color: transparent #ebe609 transparent transparent;
   bottom: -5px;
 }
 #chat .message.out {
@@ -569,7 +589,7 @@ nav #menu_collaborate {
 }
 #chat .message.out .arrow {
   left: 5px;
-  border-color: transparent transparent transparent #ffaa33;
+  border-color: transparent transparent transparent #ebe609;
   top: -5px;
 }
 #chat #chat_input {
@@ -647,5 +667,11 @@ nav #menu_collaborate {
   display: none !important;
 }
 #prioritize .vote {
+  display: block;
+}
+#export .idea-delete {
+  display: none !important;
+}
+#export .idea-score {
   display: block;
 }

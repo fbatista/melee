@@ -4,7 +4,7 @@
 @mono: 'Droid Sans Mono', Courier, "Courier New", monospace;
 @bg: #eee; /* main page background color */
 @sb: 130px; /* sidebar size */
-@chatbaloon: #fa3;
+@chatbaloon: #EBE609;
 
 body {
 	background: @bg;
@@ -104,6 +104,24 @@ nav {
 		height: 20px;
 		float: right;
 		cursor: pointer;
+	}
+
+	.idea-score {
+		display:none;
+		margin-right: -20px;
+		margin-top: -20px;
+		height: 20px;
+		min-width: 20px;
+		float: right;
+		background: #009900;
+		color: white;
+		font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
+		line-height: 20px;
+		text-align: center;
+		vertical-align:bottom;
+		border: 3px solid white;
+		.border-radius(20px);
+		.box-shadow(0px 0px 1px 1px rgba(0, 100, 0, 0.3));
 	}
 	
 	.vote {
@@ -229,8 +247,8 @@ nav {
 	.message {
 		margin: 10px;
 		background: @chatbaloon;
-		color:white;
-		white-space: pre;
+		color:#505050;
+		white-space: pre-wrap;
 		padding: 5px;
 		position: relative;
 
@@ -240,7 +258,7 @@ nav {
 			z-index: -1
 		}
 		.author {
-			color:black;
+			color:#111;
 		}
 	}
 
@@ -349,6 +367,16 @@ nav {
 		display: none !important;
 	}
 	.vote {
+		display: block;
+	}
+}
+
+#export {
+	.idea-delete {
+		display: none !important;
+	}
+
+	.idea-score {
 		display: block;
 	}
 }

@@ -102,6 +102,7 @@ io.sockets.on('connection', function(socket) {
 			});
 			rc.hgetall(idea, function(err, idea_json){
 				socket.broadcast.to(sessionid).emit("vote retracted", idea_json);
+				socket.emit("vote retracted", idea_json);
 			});
 		});
 	});
@@ -115,6 +116,7 @@ io.sockets.on('connection', function(socket) {
 			});
 			rc.hgetall(idea, function(err, idea_json){
 				socket.broadcast.to(sessionid).emit("vote received", idea_json);
+				socket.emit("vote received", idea_json);
 			});
 		});
 	});

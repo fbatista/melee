@@ -66,7 +66,7 @@ $(function(){
 					}, this)
 				});
 				this.expanded = true;
-				this.model.trigger('cluster:ideas:shown');
+				$(this.el).trigger('cluster:ideas:shown', this.model);
 			}
 		},
 		

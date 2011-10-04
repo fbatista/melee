@@ -23,7 +23,7 @@ $(function(){
 			this.ideateView = new IdeateView();
 			this.clusterateView = new ClusterateView();
 			this.prioritizeView = new PrioritizeView();
-			//this.exportView = new ExportView();
+			this.exportView = new ExportView();
 		},
 		
 	 	sessionStarted: function(session, userSuccessCallback) {
@@ -64,28 +64,32 @@ $(function(){
 				onUserDisconnected : this.chatView.removeUser,
 				onUserUpdated : this.chatView.updateUser,
 				onNewMessageIn : this.chatView.addMessage,
-				onNewCluster : this.clusterateView.onNewCluster,
-				onMoveToCluster : this.clusterateView.onMoveToCluster,
+				onNewCluster : $.proxy(function(cluster) {
+					this.clusterateView.onNewCluster(cluster);
+					this.prioritizeView.onNewCluster(cluster);
+				}, this),
+				onMoveToCluster : $.proxy(function(idea) {
+					this.clusterateView.onMoveToCluster(idea);
+					this.prioritizeView.onMoveToCluster(idea);
+				}, this),
 				onDestroyIdea : $.proxy(function(idea) {
 					this.ideateView.onDestroyIdea(idea);
 					this.clusterateView.onDestroyIdea(idea);
 				}, this),
-				onDestroyCluster : this.clusterateView.onDestroyCluster,
-				onRemoveIdeaFromCluster : this.clusterateView.onRemoveIdeaFromCluster,
+				onDestroyCluster : $.proxy(function(cluster) {
+					this.clusterateView.onDestroyCluster(cluster);
+					this.prioritizeView.onDestroyCluster(cluster);
+				}, this),
+				onRemoveIdeaFromCluster : $.proxy(function(idea) {
+					this.clusterateView.onRemoveIdeaFromCluster(idea);
+					this.prioritizeView.onRemoveIdeaFromCluster(idea);
+				}, this),
 				onNewIdea : $.proxy(function(idea) {
 					this.ideateView.onNewIdea(idea);
 					this.clusterateView.onNewIdea(idea);
 				}, this),
-				onVoteReceived : function(data){
-					//TODO this should be a function on the export view
-					console.log("vote received");
-					console.log(data);
-				},
-				onVoteRetracted : function(data){
-					//TODO this should be a function on the export view
-					console.log("vote retracted");
-					console.log(data);
-				}
+				onVoteReceived : this.exportView.onVoteReceived,
+				onVoteRetracted : this.exportView.onVoteRetracted
 			});
 
 			this.chatView.bind('chat:changenick', $.proxy(this.socket.setNickname, this.socket));

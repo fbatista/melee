@@ -9,6 +9,9 @@
 	
 	<script type="text/template" id="idea-template">
 		<img src="/images/close.png" class="idea-delete">
+		<span class="idea-score">
+			<%% print(typeof(score) == 'undefined' ? 0 : (score || 0));%>
+		</span>
 		<span class="idea-title">
 			<%%= title %>
 		</span>
@@ -51,6 +54,11 @@
 	<script type="text/template" id="prioritizeview-template">
 		<h1>You have <span id="remaining-votes">5</span> votes remaining.</h1>
 		<div id="p-clusterlist"></div>
+	</script>
+
+	<script type="text/template" id="exportview-template">
+		<h1><a id="download-results" href="javascript:void(0);" target="_blank">Download</a> brainstorm results</h1>
+		<div id="resultlist"></div>
 	</script>
 	<!-- This one-liner is on purpose, so that white-space: pre; doesn't break. -->
 	<script type="text/template" id="message-template"><div class="arrow"></div><%%= text %><div class="author"><%%= author %></div></script>

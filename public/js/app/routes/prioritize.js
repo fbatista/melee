@@ -5,7 +5,8 @@ $(function(){
 		bootstrapped: false,
 		
 		events: {
-			"idea:vote .idea": "vote"
+			"idea:vote .idea": "vote", 
+			"cluster:ideas:shown .cluster": "onClusterExpand"
 		},
 		
 		initialize: function() {
@@ -34,11 +35,7 @@ $(function(){
 				});
 				
 				this.router.sessionStarted(opts['session'], $.proxy(function(){
-					this.clusters.fetch({success: $.proxy(function(collection, response){
-						collection.each($.proxy(function(cluster){
-							this.bindIdeasDisplay(cluster);
-						}, this));
-					},this)});
+					this.clusters.fetch();
 					this.updateVoteCounter();
 					this.router.current_user.set({step: 'Prioritize'});
 					this.router.current_user.bind('change:votes', this.updateVoteCounter, this);
@@ -74,17 +71,15 @@ $(function(){
 			return this;
 		},
 
-		bindIdeasDisplay: function(cluster) {
-			cluster.bind("cluster:ideas:shown", function(){
-				this.router.current_user.votes.each($.proxy(function(voted_idea){
-					var idea_id = voted_idea.get('idea').split(":")[2];
-					cluster.ideas.each(function(idea){
-						if (idea.id === idea_id) {
-							idea.trigger('bootstrap:vote');
-						}
-					});
-				},this));
-			}, this);
+		onClusterExpand: function(ev, cluster){
+			this.router.current_user.votes.each($.proxy(function(voted_idea){
+				var idea_id = voted_idea.get('idea').split(":")[2];
+				cluster.ideas.each(function(idea){
+					if (idea.id === idea_id) {
+						idea.trigger('bootstrap:vote');
+					}
+				});
+			},this));
 		},
 		
 		proceed: function() {
@@ -97,14 +92,12 @@ $(function(){
 		onNewCluster : function(cluster) {
 			if(this.bootstrapped && !this.clusters.get(cluster.id)){
 				this.clusters.add(cluster);
-				this.bindIdeasDisplay(cluster);
 			}
 		},
 		
 		onMoveToCluster : function(idea) {
 			var cluster_id = idea.cluster.split(":")[2];
 			if(this.bootstrapped && !this.clusters.get(cluster_id).ideas.get(idea.id)){
-				this.unsortedIdeas.get(idea.id).trigger('destroy', this.unsortedIdeas.get(idea.id));
 				this.clusters.get(cluster_id).ideas.add(idea);
 			}
 		},

@@ -15,6 +15,19 @@ def get_ideas(session, cluster=nil)
 	end
 end
 
+def get_results(session)
+	ideas_with_scores = $redis.zrevrangebyscore("session:#{session}:ideas", "+inf", "(0", :withscores => true)
+	i = 0
+	ideas_for_json = []
+	while i < ideas_with_scores.length do
+		temp_idea = $redis.hgetall(ideas_with_scores[i])
+		temp_idea["score"] = ideas_with_scores[i+1].to_i
+		ideas_for_json << temp_idea
+		i = i + 2
+	end
+	return ideas_for_json
+end
+
 def get_voted_ideas(user)
 	$redis.smembers "#{user}:votes"
 end
@@ -171,6 +184,11 @@ get "/:id/ideas" do
 	get_ideas(params[:id]).to_json
 end
 
+get "/:id/results" do
+	content_type "application/json"
+	get_results(params[:id]).to_json
+end
+
 get "/:sessionid/clusters/:id/ideas" do
 	content_type "application/json"
 	get_ideas(params[:sessionid], params[:id]).to_json
@@ -269,5 +287,6 @@ get "/:id/prioritize" do
 end
 
 get "/:id/export" do
+	@results = get_results(params[:id]).to_json
 	erb :export
 end
