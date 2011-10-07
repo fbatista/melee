@@ -29,6 +29,8 @@ $(function(){
 		addUser : function(user) {
 			if(this.bootstrapped && !this.users.get(user.id)){
 				this.users.add(user);
+			} else {
+				this.updateUser(user);
 			}
 		},
 		

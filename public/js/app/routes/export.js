@@ -38,6 +38,8 @@ $(function(){
 				},this));
 
 				this.bootstrapped = true;
+			}else{
+				this.router.current_user.set({step: 'Export'});
 			}
 		},
 

@@ -9,12 +9,9 @@
 	
 	<script type="text/template" id="idea-template">
 		<img src="/images/close.png" class="idea-delete">
-		<span class="idea-score">
-			<%% print(typeof(score) == 'undefined' ? 0 : (score || 0));%>
-		</span>
-		<span class="idea-title">
-			<%%= title %>
-		</span>
+		<span class="idea-score"><%% print(typeof(score) == 'undefined' ? 0 : score); %></span>
+		<span class="cluster" <%% print(typeof(cluster) == 'undefined' ? 'style="display:none"' : ''); %>><%% print(typeof(cluster) == 'undefined' ? "" : cluster.title); %></span>
+		<span class="idea-title"><%%= title %></span>
 		<span class="vote">&#x2714;</span>
 	</script>
 	
@@ -64,7 +61,9 @@
 	<script type="text/template" id="message-template"><div class="arrow"></div><%%= text %><div class="author"><%%= author %></div></script>
 	
 	<script type="text/template" id="user-template">
-		<%%= nickname %><span class="step"> @ <%% print(step || 'ideate'); %></span> | <span class="votes"><%% print(votes || 5); %> votes remaining</span>
+		<%% print(typeof(nickname) == 'undefined' ? "Anonymous" : (nickname || "Anonymous")); %>
+		<span class="step"> @ <%% print(step || 'Ideate'); %></span> | 
+		<span class="votes"><%% print(typeof(votes) == 'undefined' ? 0 : votes); %> votes remaining</span>
 	</script>
 </head>
 

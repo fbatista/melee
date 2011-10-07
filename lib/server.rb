@@ -22,6 +22,7 @@ def get_results(session)
 	while i < ideas_with_scores.length do
 		temp_idea = $redis.hgetall(ideas_with_scores[i])
 		temp_idea["score"] = ideas_with_scores[i+1].to_i
+		temp_idea["cluster"] = $redis.hgetall(temp_idea["cluster"])
 		ideas_for_json << temp_idea
 		i = i + 2
 	end

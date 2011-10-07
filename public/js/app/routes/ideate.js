@@ -31,6 +31,8 @@ $(function(){
 					this.router.current_user.set({step: 'Ideate'});
 				},this));
 				this.bootstrapped = true;
+			}else{
+				this.router.current_user.set({step: 'Ideate'});
 			}
 		},
 		
