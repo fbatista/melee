@@ -101,7 +101,7 @@ io.sockets.on('connection', function(socket) {
 				rc.srem(currentuserid + ':votes', idea);
 			});
 			rc.hgetall(idea, function(err, idea_json){
-				rc.hgetall(idea_json.cluster, function(err, cluster_json)){
+				rc.hgetall(idea_json.cluster, function(err, cluster_json){
 					idea_json.cluster = cluster_json;
 					socket.broadcast.to(sessionid).emit("vote retracted", idea_json);
 					socket.emit("vote retracted", idea_json);
@@ -118,7 +118,7 @@ io.sockets.on('connection', function(socket) {
 				rc.sadd(currentuserid + ':votes', idea);
 			});
 			rc.hgetall(idea, function(err, idea_json){
-				rc.hgetall(idea_json.cluster, function(err, cluster_json)){
+				rc.hgetall(idea_json.cluster, function(err, cluster_json){
 					idea_json.cluster = cluster_json;
 					socket.broadcast.to(sessionid).emit("vote received", idea_json);
 					socket.emit("vote received", idea_json);

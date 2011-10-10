@@ -13,6 +13,7 @@ $(function(){
 			$(this.el).html(this.template());
 			this.download = this.$('#download-results');
 			this.resultlist = this.$('#resultlist');
+			this.clusteredResultlist = this.$('#clusteredresultlist');
 		},
 
 		bootstrap: function(opts) {
@@ -31,6 +32,11 @@ $(function(){
 					collection: this.resultIdeas
 				});
 
+				this.clusteredResultListView = new ClusteredResultListView({
+					title: "Ideas, grouped by cluster:",
+					collection: this.resultIdeas
+				});
+
 				this.router.sessionStarted(opts['session'], $.proxy(function(){
 					this.resultIdeas.fetch();
 					this.router.current_user.set({step: 'Export'});
@@ -45,11 +51,16 @@ $(function(){
 
 		render: function() {
 			$(this.resultlist).html(this.resultListView.render().el);
+			$(this.clusteredResultlist).html(this.clusteredResultListView.render().el);
 			return this;
 		},
 
 		updateLink: function() {
-			this.download.attr('href', "data:text/x-markdown;charset=utf-8,"+escape(this.resultListView.toMarkdown()));
+			var markDown = "# Melee session results #\n\n";
+			markDown += this.clusteredResultListView.toMarkdown();
+			markDown += "\n";
+			markDown += this.resultListView.toMarkdown();
+			this.download.attr('href', "data:text/x-markdown;charset=utf-8,"+escape(markDown));
 		},
 
 		onVoteReceived: function(idea) {

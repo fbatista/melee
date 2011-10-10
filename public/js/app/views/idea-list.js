@@ -27,7 +27,7 @@ $(function(){
 		},
 
 		toMarkdown: function() {
-			var md = "# Melee session results #\n\n";
+			var md = "";
 			if(this.collection.length > 0) {
 				if (this.collection.length > 10) {
 					md += "## Top 10 ideas ##\n\n";

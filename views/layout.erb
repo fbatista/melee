@@ -55,8 +55,23 @@
 
 	<script type="text/template" id="exportview-template">
 		<h1>Check out the final scores and <a id="download-results" href="javascript:void(0);" target="_blank">download</a> your brainstorm results</h1>
+		<div id="clusteredresultlist"></div>
 		<div id="resultlist"></div>
 	</script>
+
+	<script type="text/template" id="clusteredresultlistview-template">
+		<div class="clearfix">
+			<h1><%%= title %></h1>
+		</div>
+	</script>
+
+	<script type="text/template" id="clusteredresultcluster-template">
+		<div class="cluster clearfix">
+			<h2><%%= title %></h2>
+			<div class="ideas"></div>
+		</div>
+	</script>
+
 	<!-- This one-liner is on purpose, so that white-space: pre; doesn't break. -->
 	<script type="text/template" id="message-template"><div class="arrow"></div><%%= text %><div class="author"><%%= author %></div></script>
 	
@@ -113,6 +128,7 @@
 	<script src="/js/app/views/idea-list.js"></script>
 	<script src="/js/app/views/cluster.js"></script>
 	<script src="/js/app/views/cluster-list.js"></script>
+	<script src="/js/app/views/clustered-result-list.js"></script>
 	<script src="/js/app/views/message.js"></script>
 	<script src="/js/app/views/message-list.js"></script>
 	<script src="/js/app/views/user.js"></script>
