@@ -38,9 +38,8 @@ $(function(){
 				});
 
 				this.router.sessionStarted(opts['session'], $.proxy(function(){
-					this.resultIdeas.fetch();
+					this.resultIdeas.fetch({success : $.proxy(this.updateLink, this)});
 					this.router.current_user.set({step: 'Export'});
-					this.updateLink();
 				},this));
 
 				this.bootstrapped = true;
@@ -63,28 +62,36 @@ $(function(){
 			this.download.attr('href', "data:text/x-markdown;charset=utf-8,"+escape(markDown));
 		},
 
+		/**
+		 * Socket events
+		 */
+
 		onVoteReceived: function(idea) {
-			var res_idea = this.resultIdeas.get(idea.id);
-			if(res_idea){
-				res_idea.set({score: (res_idea.get('score') + 1)});
-				this.resultIdeas.sort();
-			}else {
-				idea.score = 1
-				this.resultIdeas.add(idea);
+			if(this.bootstrapped){
+				var res_idea = this.resultIdeas.get(idea.id);
+				if(res_idea){
+					res_idea.set({score: (res_idea.get('score') + 1)});
+					this.resultIdeas.sort();
+				}else {
+					idea.score = 1
+					this.resultIdeas.add(idea);
+				}
+				this.updateLink();
 			}
-			this.updateLink();
 		},
 
 		onVoteRetracted: function(idea) {
-			var res_idea = this.resultIdeas.get(idea.id);
-			if(res_idea){
-				res_idea.set({score: (res_idea.get('score') - 1)});
-				if(res_idea.get('score') <= 0) {
-					res_idea.trigger('destroy', res_idea);
-				}else{
-					this.resultIdeas.sort();	
+			if(this.bootstrapped){
+				var res_idea = this.resultIdeas.get(idea.id);
+				if(res_idea){
+					res_idea.set({score: (res_idea.get('score') - 1)});
+					if(res_idea.get('score') <= 0) {
+						res_idea.trigger('destroy', res_idea);
+					}else{
+						this.resultIdeas.sort();	
+					}
+					this.updateLink();
 				}
-				this.updateLink();
 			}
 		}
 	});	
