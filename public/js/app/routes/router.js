@@ -17,6 +17,7 @@ $(function(){
 			this.opts = opts || {};
 			this.opts.router = this;
 			this.chat_container = $('#chat');
+			this.notification_badge = $('#notification_badge');
 			this.container = $('#melee');
 			this.chatView = new ChatView();
 			this.sessionView = new SessionView();
@@ -197,6 +198,8 @@ $(function(){
 				$chat_container.animate({marginLeft : 130}, {easing: 'easeInOutQuart'});
 				this.container.animate({marginLeft : 390}, {easing: 'easeInOutQuart'});
 				this.chat_open = true;
+				this.notification_badge.hide();
+				this.notification_badge.text('0');
 			}
 		},
 		

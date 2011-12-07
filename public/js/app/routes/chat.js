@@ -65,7 +65,15 @@ $(function(){
 		},
 		
 		addMessage : function(message) {
-			this.messages.add(message);
+			if(this.bootstrapped){
+				if(!this.router.chat_open){
+					//chat is closed, add or increment the notification badge
+					var count = parseInt(this.router.notification_badge.text());
+					this.router.notification_badge.show();
+					this.router.notification_badge.text(count + 1);
+				}
+				this.messages.add(message);
+			}
 		},
 		
 		nickSubmit : function(ev) {
@@ -87,6 +95,9 @@ $(function(){
 				return;
 			}
 			ev.preventDefault();
+			if(this.textarea.val() == ""){
+				return;
+			}
 			var message = new Message({text: this.textarea.val(), author: this.author, out: false});
 			this.messages.create(message);
 			this.trigger('chat:newmessage', message);
