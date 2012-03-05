@@ -48,7 +48,6 @@ $(function(){
 			this.model.trigger('destroy');
 			this.model.collection.remove(this.model, {silent: true});
 			//this will trigger a PUT in the backend.
-			//clusterView.model.ideas.create(this.model);
 			clusterView.model.ideas.add(this.model, {silent: true});
 			this.model.save({}, {success: $.proxy(function(){
 				clusterView.model.ideas.trigger('add', this.model);
