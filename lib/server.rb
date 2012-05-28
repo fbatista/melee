@@ -19,12 +19,11 @@ def get_results(session)
 	ideas_with_scores = $redis.zrevrangebyscore("session:#{session}:ideas", "+inf", "(0", :withscores => true)
 	i = 0
 	ideas_for_json = []
-	while i < ideas_with_scores.length do
-		temp_idea = $redis.hgetall(ideas_with_scores[i])
-		temp_idea["score"] = ideas_with_scores[i+1].to_i
+	ideas_with_scores.each do |idea_with_score|
+		temp_idea = $redis.hgetall(idea_with_score.first)
+		temp_idea["score"] = idea_with_score.last.to_i
 		temp_idea["cluster"] = $redis.hgetall(temp_idea["cluster"])
 		ideas_for_json << temp_idea
-		i = i + 2
 	end
 	return ideas_for_json
 end
