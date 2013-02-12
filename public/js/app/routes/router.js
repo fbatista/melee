@@ -76,6 +76,7 @@ $(function(){
 				onDestroyIdea : $.proxy(function(idea) {
 					this.ideateView.onDestroyIdea(idea);
 					this.clusterateView.onDestroyIdea(idea);
+					this.prioritizeView.onDestroyIdea(idea);
 				}, this),
 				onDestroyCluster : $.proxy(function(cluster) {
 					this.clusterateView.onDestroyCluster(cluster);
@@ -90,7 +91,10 @@ $(function(){
 					this.clusterateView.onNewIdea(idea);
 				}, this),
 				onVoteReceived : this.exportView.onVoteReceived,
-				onVoteRetracted : this.exportView.onVoteRetracted
+				onVoteRetracted : $.proxy(function(idea) {
+					this.exportView.onVoteRetracted(idea);
+					this.prioritizeView.onVoteRetracted(idea);
+				}, this)
 			});
 
 			this.chatView.bind('chat:changenick', $.proxy(this.socket.setNickname, this.socket));

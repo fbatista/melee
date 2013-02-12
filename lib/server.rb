@@ -62,10 +62,22 @@ end
 def destroy_idea(session, idea)
 	cluster = $redis.hget "idea:#{session}:#{idea}", "cluster"
 	remove_idea_from_cluster(session, cluster.split(":").last, idea) if cluster
+	remove_votes_from_idea(session, idea, cluster)
 	$redis.zrem "session:#{session}:ideas", "idea:#{session}:#{idea}"
 	$redis.del "idea:#{session}:#{idea}"
 	return cluster.split(":").last if cluster
 	return nil
+end
+
+def remove_votes_from_idea(session, idea, cluster)
+	users = $redis.smembers "session:#{session}:users"
+	users.each do |user|
+		removed = $redis.srem "#{user}:votes", "idea:#{session}:#{idea}"
+		if removed
+			json_cluster = {:id => cluster.split(":").last} if cluster
+			$redis.publish "melee:data:#{params[:session]}:vote retracted", {:id => idea, :cluster => json_cluster}.to_json
+		end
+	end
 end
 
 def remove_idea_from_cluster(session, cluster, idea)

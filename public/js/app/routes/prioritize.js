@@ -55,9 +55,7 @@ $(function(){
 			var idea_id = "idea:"+this.router.opts.session.id+":"+ideaView.model.id;
 			if(this.router.current_user.votes.get(idea_id)){
 				//remove vote
-				this.router.current_user.votes.get(idea_id).destroy({socket : this.router.socket});
-				ideaView.$('.vote').animate({backgroundColor : '#999999'}, 350);
-				this.router.current_user.set({votes : (this.router.current_user.get('votes') + 1)});
+				this.retractVote(idea_id, ideaView);
 			} else {
 				//add vote
 				if(this.router.current_user.get('votes') > 0){
@@ -66,6 +64,12 @@ $(function(){
 					ideaView.$('.vote').animate({backgroundColor : '#00ff00'}, 350);
 				}
 			}
+		},
+
+		retractVote: function(idea_id, ideaView) {
+			this.router.current_user.votes.get(idea_id).destroy({socket : this.router.socket});
+			ideaView.$('.vote').animate({backgroundColor : '#999999'}, 350);
+			this.router.current_user.set({votes : (this.router.current_user.get('votes') + 1)});
 		},
 		
 		render: function() {
@@ -91,6 +95,15 @@ $(function(){
 		/*
 		S O C K E T   E V E N T S
 		*/
+		//idea removed, vote retracted server side
+		onVoteRetracted : function(idea) {
+			var idea_id = "idea:"+this.router.opts.session.id + ":" + idea.id;
+			if(this.bootstrapped && this.router.current_user.votes.get(idea_id)) {
+				this.router.current_user.votes.get(idea_id).destroy({socket: {removeVote: function(){}}});
+				this.router.current_user.set({votes : (this.router.current_user.get('votes') + 1)});
+			}
+		},
+
 		onNewCluster : function(cluster) {
 			if(this.bootstrapped && !this.clusters.get(cluster.id)){
 				this.clusters.add(cluster);
