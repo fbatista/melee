@@ -7,9 +7,21 @@ $(function(){
 		},
 
 		initialize: function(){
-			_.bindAll(this, 'render', 'add');
+			_.bindAll(this, 'render', 'add', 'helpCheck');
 			this.collection.bind('add', this.add);
 			this.collection.bind('reset', this.render);
+
+			this.collection.bind('reset', this.helpCheck);
+			this.collection.bind('add', this.helpCheck);
+			this.collection.bind('remove', this.helpCheck);
+		},
+
+		helpCheck: function() {
+			if(this.collection.length == 0) {
+				$(this.el).find('.help').show();
+			} else {
+				$(this.el).find('.help').hide();
+			}
 		},
 
 		render: function(){			

@@ -39,6 +39,7 @@ $(function(){
 		
 		proceed : function() {
 			this.remove();
+			this.router.opts.showWelcome = true;
 			this.router.sessionStarted(this.model, $.proxy(function(){
 				this.router.navigate(this.model.id+"/ideate", true);
 			}, this));

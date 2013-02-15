@@ -1,0 +1,7 @@
+<script type="text/template" id="idea-template">
+	<a class="idea-delete close"href="javascript:void(0);">&#x2573;</a>
+	<span class="idea-score"><%% print(typeof(score) == 'undefined' ? 0 : score); %></span>
+	<span class="cluster" <%% print(typeof(cluster) == 'undefined' ? 'style="display:none"' : ''); %>><%% print(typeof(cluster) == 'undefined' ? "" : cluster.title); %></span>
+	<span class="idea-title"><%%= title %></span>
+	<span class="vote">&#x2714;</span>
+</script>

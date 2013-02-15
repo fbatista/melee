@@ -14,9 +14,74 @@ body {
 	font: 12px "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+.ui-draggable {
+	cursor: move;
+
+	.idea-delete {
+		display:none !important;
+	}
+}
+
 a {
 	color: #00B7FF;
 	text-decoration: none;
+}
+
+.start-wrap {
+	width: 800px;
+	margin:auto;
+	.box-shadow;
+}
+
+.start-page {
+	text-align: center;
+	background: white;
+	padding: 10px 10px 50px 10px;
+
+
+	p {
+		margin-bottom: 50px;
+	}
+}
+
+.footer {
+	color: #eee;
+	#gradient > .vertical(#555,#444);
+	padding: 10px 10px 30px 10px;
+
+	a {
+		color: #fff888;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+	.disclaimer {
+		float: right;
+	}
+
+	.links {
+		float: left;
+	}
+}
+
+#new-session {
+	color: #464646;
+	cursor: pointer;
+	font-size: 40px;
+	
+	padding: 10px;
+	#gradient > .vertical(#fffeee,#fffccc);
+	
+	.border-radius(10px);
+	.box-shadow;
+
+	&:hover {
+		text-shadow: 0px 0px 5px #fff;
+		
+		#gradient > .vertical(#fff999,#fff999);
+	}
 }
 
 nav {
@@ -32,6 +97,7 @@ nav {
 	/*padding-top: 30px;*/
 
 	span {
+		position: relative;
 		text-align: right;
 		font-size: 12px;
 		font-weight: bold;
@@ -40,11 +106,32 @@ nav {
 		padding: 15px 15px;
 		background: #222;
 		border-bottom: 1px solid #333;
-	}
-	
-	span.current {
-		background-color: black !important;
-		color: yellow;
+		cursor: pointer;
+
+		.arrow {
+			display:none;
+			height: 0px;
+    		position: absolute;
+    		width: 0px;
+    		border-width: 22px 15px 23px 10px;
+    		border-color: transparent transparent transparent black;
+    		border-style: solid;
+    		top: 0px;
+    		right: -25px;
+		}
+
+		&.current {
+			background-color: black !important;
+			color: yellow;
+
+			.arrow {
+				display:block;
+			}
+		}
+
+		&:hover {
+			text-decoration: underline;
+		}
 	}
 	
 	#menu_ideate { background: #222 url("/images/ideate.png") no-repeat 15px}
@@ -79,7 +166,59 @@ nav {
 	position: relative;
 }
 
+.clear {
+	clear:both;
+}
+
+.close_icon {
+	position: absolute;
+	top: -10px;
+	right: -10px;
+	color: white;
+	background-color: black;
+	border: 2px solid white;
+	.border-radius(20px);
+	font-weight: bold;
+	width: 15px;
+	height: 15px;
+	line-height: 16px;
+	display: block;
+	text-align: center;
+	.box-shadow;
+}
 /* ideate */
+
+.help {
+	display: none;
+	width: 470px;
+	background-color: #fffeee;
+	padding: 20px;
+	position: relative;
+	.box-shadow;
+	margin-bottom: 10px;
+	color: #444;
+
+	&.autowidth {
+		float:left;
+		clear:both;
+		width: auto;
+	}
+
+	h1 {
+		margin-top:0px;
+	}
+
+	input {
+		color: #555;
+		margin-top: 6px;
+		width: 90%;
+		font-size: 22px;
+	}
+
+	.close {
+		.close_icon;
+	}
+}
 
 .idea {
 	position: relative;
@@ -97,13 +236,8 @@ nav {
 	font-family: 'Droid Sans Mono', Courier, "Courier New", monospace;
 	
 	.idea-delete {
+		.close_icon;
 		display: none;
-		margin-right: -20px;
-		margin-top: -20px;
-		width: 20px;
-		height: 20px;
-		float: right;
-		cursor: pointer;
 	}
 
 	.idea-score {
@@ -113,15 +247,16 @@ nav {
 		height: 20px;
 		min-width: 20px;
 		float: right;
-		background: #009900;
 		color: white;
+		font-weight: bold;
 		font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
 		line-height: 20px;
 		text-align: center;
+		#gradient > .vertical(#00BB00,#009900);
 		vertical-align:bottom;
-		border: 3px solid white;
+		border: 2px solid white;
 		.border-radius(20px);
-		.box-shadow(0px 0px 1px 1px rgba(0, 100, 0, 0.3));
+		.box-shadow;
 	}
 
 	.cluster {
@@ -144,6 +279,7 @@ nav {
 	}
 		
 	.vote {
+		cursor: pointer;
 		position:absolute;
 		display: none;
 		color: white;
@@ -195,20 +331,23 @@ nav {
 		color: gray;
 		position: relative;
 		
+		.title {
+			cursor: pointer;
+		}
+
 		.counter {
 			right: -15px;
 			top: -15px;
 			height: 20px;
 			position: absolute;
-			background: darkgray;
+			#gradient > .vertical(darkgray,gray);
 			font-size: 16px;
 			padding: 0px 6px 0px 6px;
+			text-align: center;
 			font-weight: bold;
 			color: white;
-			border-top: 3px groove white;
-			border-left: 3px groove white;
-			border-right: 3px ridge white;
-			border-bottom: 3px ridge white;
+			border: 2px solid white;
+			.box-shadow;
 			.border-radius(20px);
 			cursor: pointer;
 		}
@@ -246,6 +385,13 @@ nav {
 			width: 100%;
 			min-height: 95px;
 			padding-top: 15px;
+
+			.help {
+				background: transparent;
+				color: white;
+				font-weight: bold;
+				.box-shadow(none);
+			}
 			
 			.idea  {
 				margin-left: 15px;

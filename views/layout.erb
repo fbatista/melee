@@ -6,89 +6,42 @@
 	
 	<link href='http://fonts.googleapis.com/css?family=Droid+Sans+Mono' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="/stylesheets/style.css" type="text/css" media="screen" charset="utf-8">
-	
-	<script type="text/template" id="idea-template">
-		<img src="/images/close.png" class="idea-delete">
-		<span class="idea-score"><%% print(typeof(score) == 'undefined' ? 0 : score); %></span>
-		<span class="cluster" <%% print(typeof(cluster) == 'undefined' ? 'style="display:none"' : ''); %>><%% print(typeof(cluster) == 'undefined' ? "" : cluster.title); %></span>
-		<span class="idea-title"><%%= title %></span>
-		<span class="vote">&#x2714;</span>
-	</script>
-	
-	<script type="text/template" id="cluster-template">
-		<div class="cluster-title">
-			<span class="counter"><%% print(ideas_count || 0); %></span>
-			<span class="title"><%%= title %></span>
-			<div class="arrow" style="display:none;"></div>
-			<div class="arrow-border" style="display:none;"></div>
-		</div>
-		<div class="cluster-ideas"></div>
-	</script>
-	
-	<script type="text/template" id="clusterlistview-template">
-		<h1>Clusters</h1>
-	</script>
-	
-	<script type="text/template" id="idealistview-template">
-		<h1><%%= title %></h1>
-	</script>
-	
-	<script type="text/template" id="startsession-template">
-		<span id="new-session">START!</span>
-	</script>
-	
-	<script type="text/template" id="ideateview-template">
-		<input type="text" name="idea" id="new-idea" placeholder="Add an idea">
-		<div id="idealist"></div>
-	</script>
-	
-	<script type="text/template" id="clusterateview-template">
-		<input type="text" name="idea" id="new-cluster" placeholder="Add a cluster">
-		<div id="clusterlist"></div>
-		<div id="unsortedlist"></div>
-	</script>
-	
-	<script type="text/template" id="prioritizeview-template">
-		<h1>You have <span id="remaining-votes">5</span> votes remaining.</h1>
-		<div id="p-clusterlist"></div>
-	</script>
 
-	<script type="text/template" id="exportview-template">
-		<h1>Check out the final scores and <a id="download-results" href="javascript:void(0);" target="_blank">download</a> your brainstorm results</h1>
-		<div id="clusteredresultlist"></div>
-		<div id="resultlist"></div>
-	</script>
+	<%= erb :'partials/start' %>
+	<%= erb :'partials/idea' %>
+	<%= erb :'partials/idea_list' %>
+	<%= erb :'partials/ideate' %>
+	<%= erb :'partials/cluster' %>
+	<%= erb :'partials/cluster_list' %>
+	<%= erb :'partials/clusterate' %>
+	<%= erb :'partials/prioritize' %>
+	<%= erb :'partials/export' %>
+	<%= erb :'partials/clustered_result_cluster' %>
+	<%= erb :'partials/clustered_result_list' %>
+	<%= erb :'partials/user' %>
+	<%= erb :'partials/message' %>
 
-	<script type="text/template" id="clusteredresultlistview-template">
-		<div class="clearfix">
-			<h1><%%= title %></h1>
-		</div>
-	</script>
-
-	<script type="text/template" id="clusteredresultcluster-template">
-		<div class="cluster clearfix">
-			<h2><%%= title %></h2>
-			<div class="ideas"></div>
-		</div>
-	</script>
-
-	<!-- This one-liner is on purpose, so that white-space: pre; doesn't break. -->
-	<script type="text/template" id="message-template"><div class="arrow"></div><%%= text %><div class="author"><%%= author %></div></script>
-	
-	<script type="text/template" id="user-template">
-		<%% print(typeof(nickname) == 'undefined' ? "Anonymous" : (nickname || "Anonymous")); %>
-		<span class="step"> @ <%% print(step || 'Ideate'); %></span> | 
-		<span class="votes"><%% print(typeof(votes) == 'undefined' ? 0 : votes); %> votes remaining</span>
-	</script>
 </head>
 
 <body>
 	<nav>
-		<span id="menu_ideate">Ideate</span>
-		<span id="menu_cluster">Cluster</span>
-		<span id="menu_prioritize">Prioritize</span>
-		<span id="menu_export">Export</span>
-		<span id="menu_collaborate">Collaborate<span id="notification_badge">0</span></span>
+		<span id="menu_ideate">
+			Ideate
+			<div class="arrow"><!-- --></div>
+		</span>
+		<span id="menu_cluster">
+			Cluster
+			<div class="arrow"><!-- --></div>
+		</span>
+		<span id="menu_prioritize">
+			Prioritize
+			<div class="arrow"><!-- --></div>
+		</span>
+		<span id="menu_export">
+			Export
+			<div class="arrow"><!-- --></div>
+		</span>
+		<span id="menu_collaborate">Team chat<span id="notification_badge">0</span></span>
 	</nav>
 	<div id="chat">
 		<div class="modal"></div>

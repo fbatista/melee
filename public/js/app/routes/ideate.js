@@ -5,7 +5,8 @@ $(function(){
 		bootstrapped: false,
 		
 		events: {
-			"keypress #new-idea": "addIdea"
+			"keypress #new-idea": "addIdea",
+			"click #start-help .close": "closeHelp"
 		},
 
 		initialize: function() {
@@ -13,6 +14,8 @@ $(function(){
 			this.template = _.template($('#ideateview-template').html());
 			$(this.el).html(this.template());
 			this.input = this.$('#new-idea');
+			this.welcome = this.$('#start-help');
+			this.help_url = this.$('#start-help-url');
 			this.idealist = this.$('#idealist');
 		},
 		
@@ -30,6 +33,11 @@ $(function(){
 					this.ideas.fetch();
 					this.router.current_user.set({step: 'Ideate'});
 				},this));
+				if(opts.showWelcome) {
+					this.welcome.show();
+					this.help_url.val(document.location.href);
+					opts.showWelcome = false;
+				}
 				this.bootstrapped = true;
 			}else{
 				this.router.current_user.set({step: 'Ideate'});
@@ -40,6 +48,10 @@ $(function(){
 			// display ideas			
 			$(this.idealist).html(this.ideaListView.render().el);
 			return this;
+		},
+
+		closeHelp: function() {
+			this.welcome.hide();
 		},
 		
 		addIdea: function(e) {
@@ -65,7 +77,8 @@ $(function(){
 		
 		onDestroyIdea : function(idea) {
 			if(this.bootstrapped && this.ideas.get(idea.id)) {
-				this.ideas.get(idea.id).trigger('destroy');
+				idea_model = this.ideas.get(idea.id);
+				idea_model.trigger('destroy', idea_model);
 			}
 		}
 	});

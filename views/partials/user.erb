@@ -1,0 +1,5 @@
+<script type="text/template" id="user-template">
+	<%% print(typeof(nickname) == 'undefined' ? "Anonymous" : (nickname || "Anonymous")); %>
+	<span class="step"> @ <%% print(step || 'Ideate'); %></span> | 
+	<span class="votes"><%% print(typeof(votes) == 'undefined' ? 0 : votes); %> votes remaining</span>
+</script>
