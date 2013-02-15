@@ -34,7 +34,7 @@ $(function(){
 					this.router.current_user.set({step: 'Ideate'});
 				},this));
 				if(opts.showWelcome) {
-					this.welcome.show();
+					this.welcome.css({display:'block'});
 					this.help_url.val(document.location.href);
 					opts.showWelcome = false;
 				}
