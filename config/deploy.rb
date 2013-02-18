@@ -14,7 +14,7 @@ set :domain, 'meleeapp.com'
 set :deploy_to, '/home/melee/melee'
 set :repository, 'ssh://git@bitbucket.org/wbs/melee.git'
 set :user, 'melee'
-set :branch, 'master'
+set :branch, 'production'
 
 set :shared_paths, ['tmp', 'node/node_modules']
 
