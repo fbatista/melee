@@ -6,7 +6,44 @@ set :session_secret, 'melee super top secret session key'
 
 set :root, File.dirname(__FILE__) + "/../"
 
-SOCKET_IO_HOST = 'localhost:8000'
+javascript_bundle(:all, %w(
+	vendor/jquery-1.6.2.min
+	vendor/jquery-ui-1.8.14.custom.min
+	vendor/blind_with_stepping
+	vendor/jquery.ui.touch
+	vendor/underscore
+	vendor/backbone
+	app/models/socket
+	app/models/session
+	app/models/idea
+	app/models/idea-list
+	app/models/cluster
+	app/models/cluster-list
+	app/models/message
+	app/models/message-list
+	app/models/user
+	app/models/user-list
+	app/models/vote
+	app/models/vote-list
+	app/views/idea
+	app/views/idea-list
+	app/views/cluster
+	app/views/cluster-list
+	app/views/clustered-result-list
+	app/views/message
+	app/views/message-list
+	app/views/user
+	app/views/user-list
+	app/routes/session
+	app/routes/ideate
+	app/routes/cluster
+	app/routes/prioritize
+	app/routes/export
+	app/routes/chat
+	app/routes/router
+	)) 
+
+SOCKET_IO_HOST = 'meleeapp.com:8000'
 
 def get_ideas(session, cluster=nil)
 	ideas = cluster ? $redis.smembers("cluster:#{session}:#{cluster}:ideas") : $redis.zrange("session:#{session}:ideas", 0, -1)

@@ -58,41 +58,7 @@
 	</div>
 	<div id="melee"></div>
 	<script src="http://<%= SOCKET_IO_HOST %>/socket.io/socket.io.js"></script>
-	<script src="/js/vendor/jquery-1.6.2.min.js"></script>
-	<script src="/js/vendor/jquery-ui-1.8.14.custom.min.js"></script>
-	<script src="/js/vendor/blind_with_stepping.js"></script>
-	<script src="/js/vendor/jquery.ui.touch.js"></script>
-	<script src="/js/vendor/underscore.js"></script>
-	<script src="/js/vendor/backbone.js"></script>
-	<!-- MELEE -->
-	<script src="/js/app/models/socket.js"></script>
-	<script src="/js/app/models/session.js"></script>
-	<script src="/js/app/models/idea.js"></script>
-	<script src="/js/app/models/idea-list.js"></script>
-	<script src="/js/app/models/cluster.js"></script>
-	<script src="/js/app/models/cluster-list.js"></script>
-	<script src="/js/app/models/message.js"></script>
-	<script src="/js/app/models/message-list.js"></script>
-	<script src="/js/app/models/user.js"></script>
-	<script src="/js/app/models/user-list.js"></script>
-	<script src="/js/app/models/vote.js"></script>
-	<script src="/js/app/models/vote-list.js"></script>
-	<script src="/js/app/views/idea.js"></script>
-	<script src="/js/app/views/idea-list.js"></script>
-	<script src="/js/app/views/cluster.js"></script>
-	<script src="/js/app/views/cluster-list.js"></script>
-	<script src="/js/app/views/clustered-result-list.js"></script>
-	<script src="/js/app/views/message.js"></script>
-	<script src="/js/app/views/message-list.js"></script>
-	<script src="/js/app/views/user.js"></script>
-	<script src="/js/app/views/user-list.js"></script>
-	<script src="/js/app/routes/session.js"></script>
-	<script src="/js/app/routes/ideate.js"></script>
-	<script src="/js/app/routes/cluster.js"></script>
-	<script src="/js/app/routes/prioritize.js"></script>
-	<script src="/js/app/routes/export.js"></script>
-	<script src="/js/app/routes/chat.js"></script>
-	<script src="/js/app/routes/router.js"></script>
+	<%= javascript_bundle_include_tag(:all) %>
 	<script>
 		$(function() {
 			window.melee = new Melee(<%= yield %>);
