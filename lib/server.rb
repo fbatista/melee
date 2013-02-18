@@ -42,6 +42,7 @@ javascript_bundle(:all, %w(
 	app/routes/chat
 	app/routes/router
 	)) 
+disable(:compress_bundles)
 
 SOCKET_IO_HOST = 'meleeapp.com:8000'
 
