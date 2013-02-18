@@ -6,7 +6,7 @@ set :session_secret, 'melee super top secret session key'
 
 set :root, File.dirname(__FILE__) + "/../"
 
-SOCKET_IO_HOST = 'localhost:8000'
+SOCKET_IO_HOST = 'meleeapp.com:8000'
 
 def get_ideas(session, cluster=nil)
 	ideas = cluster ? $redis.smembers("cluster:#{session}:#{cluster}:ideas") : $redis.zrange("session:#{session}:ideas", 0, -1)
