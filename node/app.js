@@ -39,7 +39,12 @@ pubsub.on("connect", function() {
 // we send it over to all connected clients
 pubsub.on("pmessage", function (pattern, channel, message) {
 	//console.log("Sending: " + message);
+
+	// channel has the following format:
+	// melee:data:SESSION_ID:SUBJECT
 	var channel_meta = channel.split(":");
+	//channel_meta[2] => session_id
+	//channel_meta[3] => subject
 	io.sockets.in(channel_meta[2]).emit(channel_meta[3], JSON.parse(message));
 });
 
