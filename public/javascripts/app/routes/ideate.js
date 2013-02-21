@@ -56,6 +56,7 @@ $(function(){
 		
 		addIdea: function(e) {
 			if(e.keyCode != 13) return;
+			if(this.input.val().replace(/(^( )*)|(( )*$)/g, "").length == 0) return;
 			var idea = new Idea({title: this.input.val()});
 			idea.collection = this.ideas;
 			idea.save();

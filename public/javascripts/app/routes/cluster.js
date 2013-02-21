@@ -88,6 +88,7 @@ $(function(){
 		
 		addCluster: function(e){
 			if(e.keyCode != 13) return;
+			if(this.input.val().replace(/(^( )*)|(( )*$)/g, "").length == 0) return;
 			var cluster = new Cluster({title: this.input.val()});
 			cluster.collection = this.clusters;
 			cluster.save();
